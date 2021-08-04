@@ -1,0 +1,58 @@
+#lang rhombus
+
+require:
+  disposable rename:
+    #{call/disposable} 'to' call_with_disposable
+  keyring rename:
+    #{default-keyring} 'to' default_keyring
+    #{make-keyring-from-string} 'to' make_keyring_from_string
+    #{get-password} 'to' get_password
+  #{net/http-easy} rename:
+    #{basic-auth} 'to' basic_auth
+    #{current-session} 'to' current_http_session
+    #{response-close!} 'to' response_close
+    #{response-json} 'to' response_json
+    #{session-request} 'to' session_request
+  #{net/url} rename:
+    #{string->url} 'to' string_to_url
+  "shim.rkt"
+
+value jobs_url:
+  string_to_url("https://splunk-host:8089/services/search/jobs?output_mode=json&search=dispatchState%3dRUNNING&count=0")
+
+function keyring_auth(service_user_lookup, auth_proc):
+  function(url, headers, query):
+    value (service_name, user_name): service_user_lookup(url, headers, query)
+    value password: get_password(service_name, user_name)
+    auth_proc(user_name, password)(url, headers, query)
+
+define service_auth:
+  keyring_auth(function(u, h, q): values("splunk", "my-username"),
+               basic_auth)
+
+define http_request:
+  make_kw_proc(
+    // XXX: in a general case use a rest-arg but there is only one positional
+    // argument we care about here.
+    function(kws, kwargs, uri):
+      value max_tries: 10
+      value pos_args: list(current_http_session(), uri)
+      function request_retry(tries_left):
+        value should_retry:
+          if tries_left == 0:
+           | function(exn): #false
+           | is_exn_fail
+        proc_with_handlers(
+          should_retry,
+          function(e): request_retry(tries_left - 1),
+          function(): keyword_apply(session_request, kws, kwargs, pos_args))
+      disposable(
+        function(): request_retry(max_tries),
+        response_close))
+
+default_keyring(
+  make_keyring_from_string("keychain://"))
+
+call_with_disposable(
+  http_request(jobs_url, 'auth': service_auth),
+  response_json)
