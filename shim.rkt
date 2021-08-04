@@ -8,7 +8,7 @@
   [keyword-apply keyword_apply]
   [make-keyword-procedure make_kw_proc]))
 
-;; one case handling exception handling
+;; one case exception handling
 (define (proc_with_handlers exn? exn-handle body)
   (with-handlers* ([exn? exn-handle])
     (body)))
