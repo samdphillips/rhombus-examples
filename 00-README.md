@@ -1,7 +1,8 @@
-# Kicking the tires of Rhombus - 2021/08/04
+# Kicking the tires of Rhombus
 
 **NOTE** The Rhombus proposal is not stable.  This example should be considered a point in time example.  I may or may not update this to reflect newer versions fo the proposal.
 
+## 2021/08/04
 This is a translation of a kind of scraping script I've written in Racket.
 
 Some notes:
