@@ -8,7 +8,7 @@ import:
   "url.rkt"
 
 val jobs_url:
-  url.string_to_url("https://splunk-host:8089/services/search/jobs?output_mode=json&search=dispatchState%3dRUNNING&count=0")
+  url.string_to_url("https://my-webservice.com")
 
 fun keyring_auth(service_user_lookup, auth_proc):
   fun(a_url, headers, query):
