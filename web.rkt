@@ -1,11 +1,11 @@
 #lang rhombus
 
 import:
-  "private/disposable.rkt": prefix d
-  "private/http.rkt"
-  "private/keyring.rkt"
-  "private/racket.rkt": prefix rkt
-  "private/url.rkt"
+  "web/private/disposable.rkt": prefix d
+  "web/private/http.rkt"
+  "web/private/keyring.rkt"
+  "web/private/racket.rkt": prefix rkt
+  "web/private/url.rkt"
 
 val jobs_url:
   url.string_to_url("https://my-webservice.com")
