@@ -5,6 +5,7 @@
          racket/provide)
 
 (provide
+ argv
  proc_with_handlers
 
  (filtered-out
@@ -14,6 +15,8 @@
    list
    keyword-apply
    make-keyword-procedure)))
+
+(define argv (current-command-line-arguments))
 
 ;; one case handling exception handling
 (define (proc_with_handlers exn? exn-handle body)

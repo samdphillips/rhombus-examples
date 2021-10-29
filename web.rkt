@@ -7,8 +7,12 @@ import:
   "web/private/racket.rkt": prefix rkt
   "web/private/url.rkt"
 
-val jobs_url:
-  url.string_to_url("https://my-webservice.com")
+val user_name: rkt.argv[0]
+val service_name: rkt.argv[1]
+val request_url_s: rkt.argv[2]
+
+val request_url:
+  url.string_to_url(request_url_s)
 
 // keyring_auth ::
 //   (Url Headers Query -> String String) AuthProc -> AuthProc
@@ -23,7 +27,7 @@ fun keyring_auth(service_user_lookup, auth_proc):
     auth_proc(user_name, password)(a_url, headers, query)
 
 val service_auth:
-  keyring_auth(fun(u, h, q): values("my-service", "my-username"), http.basic_auth)
+  keyring_auth(fun(u, h, q): values(service_name, user_name), http.basic_auth)
 
 // A disposable value (https://docs.racket-lang.org/disposable/index.html) for
 // making http requests with http-easy and closing the responses.
@@ -47,12 +51,14 @@ val http_request:
         fun(): request_retry(max_tries),
         http.response_close))
 
+#//
 keyring.default_keyring(
   keyring.make_keyring_from_string("keychain://"))
 
 val job_doc:
   d.call_with_disposable(
-    http_request(jobs_url,
+    http_request(request_url,
                  ~auth: service_auth),
     http.response_json)
 
+job_doc
