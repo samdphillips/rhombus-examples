@@ -1,6 +1,6 @@
 #lang info
 
-(define name "rhombus-example-web")
+(define name "rhombus-examples-web")
 (define collection "rhombus-examples")
 (define deps
   '("base"
