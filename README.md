@@ -29,3 +29,12 @@ Some notes:
   - Wrote a mostly automatic renaming function to use with
     [`filtered-out`](https://docs.racket-lang.org/reference/require.html#%28form._%28%28lib._racket%2Fprovide..rkt%29._filtered-out%29%29)
     from the shim modules.
+
+## 2021/10/29
+Getting back into some Rhombus.
+
+Changes (from new prototype):
+- New keyword syntax
+- `import` prefix syntax has changed
+- Syntax for alt forms has changed
+
