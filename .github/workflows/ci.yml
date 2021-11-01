@@ -1,0 +1,21 @@
+on:
+  push:
+  schedule:
+  - cron: "0 */3 * * *"
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+    - name: install racket
+      uses: Bogdanp/setup-racket@v1.6.1
+      with:
+        architecture: 'x64'
+        distribution: 'full'
+        variant: 'CS'
+        version: "current"
+    - name: install rhombus prototype
+      run: raco pkg install --batch --auto https://github.com/mflatt/shrubbery-rhombus-0.git
+    - name: install web example
+      run: raco pkg install --batch --auto ./rhombus-examples-web
