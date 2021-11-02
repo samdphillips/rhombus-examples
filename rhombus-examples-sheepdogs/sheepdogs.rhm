@@ -1,35 +1,42 @@
 #lang rhombus
 
 import:
-  r = racket/base:
+  rhombus/macro: no_prefix
+  racket/base:
+    prefix r
     rename:
-      #{null?}          'to' is_null
-      #{inexact->exact} 'to' exact
-      #{vector-ref}     'to' vector_ref
-      #{vector-set!}    'to' vector_set
-  l   = racket/list
+      #{null?}          ~to is_null
+      #{inexact->exact} ~to exact
+      #{vector-ref}     ~to vector_ref
+      #{vector-set!}    ~to vector_set
+  racket/list:
+    prefix l
 
-struct Posn(x,y)
-struct Sheep(p :: Posn)
-struct Sheepdog(p :: Posn)
-struct World(width :: Integer, height :: Integer, agents)
+class Posn(x,y)
+class Sheep(p :: Posn)
+class Sheepdog(p :: Posn)
+class World(width :: Integer, height :: Integer, agents)
 
 val sheep_view: 10
 val sheepdog_view: 25
 
 operator (a ^ b):
-  'stronger_than': * / + - <=
-  'associativity': 'right'
+  ~stronger_than: * / + - <=
+  ~associativity: ~right
   r.expt(a, b)
 
 operator (a % b):
-  'weaker_than': * /
-  'stronger_than': + -
+  ~weaker_than: * /
+  ~stronger_than: + -
   r.modulo(a, b)
 
-expr.macro ?(when ??test ... { ??body ... } ??tail ...):
-  values(?(if ??test ... { | { ??body ... } | { r.void() }}),
-         tail)
+expr.rule '(when $test ... :
+              $body ...
+              ...):
+  '(if $test ...
+    | $body ...
+      ...
+    | r.void())
 
 // make_world :: width height num_sheep num_sheepdogs -> World
 fun make_world(width :: Integer,
@@ -37,7 +44,7 @@ fun make_world(width :: Integer,
                num_sheep :: Integer,
                num_sheepdogs :: Integer):: World:
   val sheep: make_sheep(num_sheep, width, height)
-  val sheepdogs: make_sheepdogs(num_sheepdogs, width, height)                 
+  val sheepdogs: make_sheepdogs(num_sheepdogs, width, height)
   World(width, height, r.append(sheep, sheepdogs))
 
 // make_things :: make num_things width height -> Listof thing
@@ -71,28 +78,31 @@ val d: r.list(Posn(-1,-1), Posn(0, -1), Posn(1, -1),
 
 fun distance(width, height, Posn(x0, y0), Posn(x1, y1)):
   fun step(d, cur_distsq, cur_dx, cur_dy):
-    cond:
-     | r.is_null(d):
-         val dist: r.sqrt(cur_distsq)         
-         values(dist,
-                r.exact(r.round(cur_dx / dist)),
-                r.exact(r.round(cur_dy / dist)))
-     | 'else':
-         val Posn(wdx, wdy): r.car(d)
-         val dx: (x1 + wdx * width) - x0
-         val dy: (y1 + wdy * height) - y0
-         val distsq: dx ^ 2 + dy ^ 2
-         if r.not(cur_distsq) || distsq < cur_distsq:
-           | step(r.cdr(d), distsq, dx, dy)
-           | step(r.cdr(d), cur_distsq, cur_dx, cur_dy)
+    cond
+    | r.is_null(d):
+        val dist: r.sqrt(cur_distsq)
+        values(dist,
+               r.exact(r.round(cur_dx / dist)),
+               r.exact(r.round(cur_dy / dist)))
+    | ~else:
+        val Posn(wdx, wdy): r.car(d)
+        val dx: (x1 + wdx * width) - x0
+        val dy: (y1 + wdy * height) - y0
+        val distsq: dx ^ 2 + dy ^ 2
+        if r.not(cur_distsq) || distsq < cur_distsq
+        | step(r.cdr(d), distsq, dx, dy)
+        | step(r.cdr(d), cur_distsq, cur_dx, cur_dy)
   step(d, #false, #false, #false)
 
 val width: 100
 val height: 100
 val entity: Sheep(Posn(50, 50))
-val sight: match entity { | { Sheep(_): { sheep_view } }
-                          | { Sheepdog(_): { sheepdog_view } }}
-val posn: match entity { | { Sheep(p): { p } } | { Sheepdog(p): { p } } }
+val sight: match entity
+           | Sheep(_):    sheep_view
+           | Sheepdog(_): sheepdog_view
+val posn: match entity
+          | Sheep(p): p
+          | Sheepdog(p): p
 val scores: r.vector(0, 0, 0, 0, 0, 0, 0, 0, 0)
 fun update_score(dx, dy, v):
   val i: dx + 1 + 3 * (dy + 1)
@@ -102,15 +112,15 @@ fun update_score(dx, dy, v):
 fun calculate_scores(others):
   cond
   | r.is_null(others): scores
-  | 'else':
+  | ~else:
       val (dist, dx, dy, score):
-        match r.car(others):
-          | Sheep(p):
-              val (dist, dx, dy): distance(width, height, posn, p)
-              values(dist, dx, dy, 1)
-          | Sheepdog(p):
-              val (dist, dx, dy): distance(width, height, posn, p)
-              values(dist, dx, dy, -1)
+        match r.car(others)
+        | Sheep(p):
+            val (dist, dx, dy): distance(width, height, posn, p)
+            values(dist, dx, dy, 1)
+        | Sheepdog(p):
+            val (dist, dx, dy): distance(width, height, posn, p)
+            values(dist, dx, dy, -1)
       when dist <= sight:
         update_score(dx, dy, score)
       calculate_scores(r.cdr(others))

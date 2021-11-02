@@ -19,3 +19,5 @@ jobs:
       run: raco pkg install --batch --auto https://github.com/mflatt/shrubbery-rhombus-0.git
     - name: install web example
       run: raco pkg install --batch --auto ./rhombus-examples-web
+    - name: install sheepdogs example
+      run: raco pkg install --batch --auto ./rhombus-examples-sheepdogs
