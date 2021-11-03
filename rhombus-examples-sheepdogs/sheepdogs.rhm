@@ -7,18 +7,17 @@ import:
     rename:
       #{null?}          ~to is_null
       #{inexact->exact} ~to exact
-      #{vector-ref}     ~to vector_ref
-      #{vector-set!}    ~to vector_set
-  racket/list:
-    prefix l
+      #{random-seed}    ~to random_seed
+  racket/list: prefix l
 
 class Posn(x,y)
 class Sheep(p :: Posn)
 class Sheepdog(p :: Posn)
-class World(width :: Integer, height :: Integer, agents)
+class World(width :: Integer, height :: Integer, entities)
 
 val sheep_view: 10
 val sheepdog_view: 25
+r.random_seed(0xDEC777)
 
 operator (a ^ b):
   ~stronger_than: * / + - <=
@@ -45,7 +44,7 @@ fun make_world(width :: Integer,
                num_sheepdogs :: Integer):: World:
   val sheep: make_sheep(num_sheep, width, height)
   val sheepdogs: make_sheepdogs(num_sheepdogs, width, height)
-  World(width, height, r.append(sheep, sheepdogs))
+  World(width, height, l.shuffle(r.append(sheep, sheepdogs)))
 
 // make_things :: make num_things width height -> Listof thing
 fun make_things(make,
@@ -62,37 +61,36 @@ fun make_things(make,
 
 // make_sheep :: num_sheep width height -> Listof Sheep
 fun make_sheep(num_sheep :: Integer,
-               width :: Integer,
-               height :: Integer):
+               width     :: Integer,
+               height    :: Integer):
   make_things(fun(p): Sheep(p), num_sheep, width, height)
 
 // make_sheepdogs :: num_sheepdogs width height -> Listof Sheepdog
 fun make_sheepdogs(num_sheepdog :: Integer,
-                   width :: Integer,
-                   height :: Integer):
+                   width        :: Integer,
+                   height       :: Integer):
   make_things(fun(p): Sheepdog(p), num_sheepdog, width, height)
 
-val d: r.list(Posn(-1,-1), Posn(0, -1), Posn(1, -1),
-              Posn(-1, 0), Posn(0,  0), Posn(1,  0),
-              Posn(-1, 1), Posn(0,  1), Posn(1,  1))
+val d: [Posn(-1,-1), Posn(0, -1), Posn(1, -1),
+        Posn(-1, 0), Posn(0,  0), Posn(1,  0),
+        Posn(-1, 1), Posn(0,  1), Posn(1,  1)]
 
 fun distance(width, height, Posn(x0, y0), Posn(x1, y1)):
-  fun step(d, cur_distsq, cur_dx, cur_dy):
+  fun step(d, cur_distsq, cur_d):
     cond
     | r.is_null(d):
         val dist: r.sqrt(cur_distsq)
         values(dist,
-               r.exact(r.round(cur_dx / dist)),
-               r.exact(r.round(cur_dy / dist)))
+               Posn (r.exact(r.round(cur_d.x / dist)),
+                     r.exact(r.round(cur_d.y / dist))))
     | ~else:
-        val Posn(wdx, wdy): r.car(d)
-        val dx: (x1 + wdx * width) - x0
-        val dy: (y1 + wdy * height) - y0
+        val dx: (x1 + d[0].x * width) - x0
+        val dy: (y1 + d[0].y * height) - y0
         val distsq: dx ^ 2 + dy ^ 2
         if r.not(cur_distsq) || distsq < cur_distsq
-        | step(r.cdr(d), distsq, dx, dy)
-        | step(r.cdr(d), cur_distsq, cur_dx, cur_dy)
-  step(d, #false, #false, #false)
+        | step(r.cdr(d), distsq, Posn(dx, dy))
+        | step(r.cdr(d), cur_distsq, cur_d)
+  step(d, #false, #false)
 
 val width: 100
 val height: 100
@@ -103,26 +101,25 @@ val sight: match entity
 val posn: match entity
           | Sheep(p): p
           | Sheepdog(p): p
-val scores: r.vector(0, 0, 0, 0, 0, 0, 0, 0, 0)
-fun update_score(dx, dy, v):
-  val i: dx + 1 + 3 * (dy + 1)
-  val v0: r.vector_ref(scores, i)
-  r.vector_set(scores, i, v0 + v)
+val scores: Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+fun update_score(d :: Posn, v :: Number):
+  val i: d.x + 1 + 3 * (d.y + 1)
+  scores[i] = scores[i] + v
 
 fun calculate_scores(others):
   cond
   | r.is_null(others): scores
   | ~else:
-      val (dist, dx, dy, score):
+      val (dist :: Number, d :: Posn, score :: Integer):
         match r.car(others)
         | Sheep(p):
-            val (dist, dx, dy): distance(width, height, posn, p)
-            values(dist, dx, dy, 1)
+            val (dist, d): distance(width, height, posn, p)
+            values(dist, d, 1)
         | Sheepdog(p):
-            val (dist, dx, dy): distance(width, height, posn, p)
-            values(dist, dx, dy, -1)
+            val (dist, d): distance(width, height, posn, p)
+            values(dist, d, -1)
       when dist <= sight:
-        update_score(dx, dy, score)
+        update_score(d, score)
       calculate_scores(r.cdr(others))
 
-val World(_w, _h, es): make_world(100,100,100,100)
+val the_world: make_world(100,100,100,100)
