@@ -21,3 +21,7 @@ jobs:
       run: raco pkg install --batch --auto ./rhombus-examples-web
     - name: install sheepdogs example
       run: raco pkg install --batch --auto ./rhombus-examples-sheepdogs
+    - name: install kanren example
+      run: raco pkg install --batch --auto ./rhombus-examples-kanren
+    - name: check dependencies
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-web rhombus-examples-sheepdogs rhombus-examples-kanren
