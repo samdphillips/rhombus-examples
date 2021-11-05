@@ -24,7 +24,7 @@ class State (counter :: Integer, subst :: Subst)
 
 val empty_state :: State: State(0, {})
 
-fun walk(var :: Var, subst :: Subst) :: Any:
+fun walk(var, subst :: Subst) :: Any:
   val value: r.hash_ref(subst, var, #false)
   cond
   | is_Var(value): walk(value, subst)
@@ -42,11 +42,11 @@ fun unify(u, v, subst :: Subst):
   val u1: walk(u, subst)
   val v1: walk(v, subst)
   cond
-  | is_Var(u) && is_Var(v) && u === v: subst
-  | is_Var(u): subst ++ {u: v}
-  | is_Var(v): subst ++ {v: u}
-  | r.is_Pair(u) && r.is_Pair(v):
-      val s1: unify(r.car(u), r.car(v), subst)
-      s1 && unify(r.cdr(u), r.cdr(v), s1)
+  | is_Var(u1) && is_Var(v1) && u1 === v1: subst
+  | is_Var(u1): subst ++ {u1: v1}
+  | is_Var(v1): subst ++ {v1: u1}
+  | r.is_Pair(u1) && r.is_Pair(v1):
+      val s1: unify(r.car(u1), r.car(v1), subst)
+      s1 && unify(r.cdr(u1), r.cdr(v1), s1)
   | ~else:
-      u === v && subst
+      u1 === v1 && subst
