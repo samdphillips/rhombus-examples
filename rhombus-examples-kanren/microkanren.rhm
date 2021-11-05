@@ -15,10 +15,18 @@ import:
     rename:
       #{hash-ref} ~to hash_ref
       #{pair?}    ~to is_Pair
-  racket/stream: prefix rs
+  racket/stream:
+    prefix rs
+    rename:
+      #{stream-empty?} ~to is_empty_stream
+      #{stream?}       ~to is_stream
+      #{stream-first}  ~to stream_first
+      #{stream-rest}   ~to stream_rest
+      #{stream-cons}   ~to stream_cons
+      #{stream-append} ~to stream_append
 
 annotation.macro 'Stream:
-  annotation_ct.pack_predicate('(rs.#{stream?}))
+  annotation_ct.pack_predicate('(rs.is_stream))
 
 class Var (i :: Integer)
 val is_Var: #{Var?}
@@ -35,13 +43,6 @@ fun walk(var, subst :: Subst) :: Any:
   | r.not(value): var
   | ~else: value
 
-fun unify_goal(u, v):
-  fun (state :: State) :: Stream:
-    val subst: unify(u, v, state.subst)
-    if subst
-    | [State(state.counter, subst)]
-    | []
-
 fun unify(u, v, subst :: Subst):
   val u1: walk(u, subst)
   val v1: walk(v, subst)
@@ -54,3 +55,35 @@ fun unify(u, v, subst :: Subst):
       s1 && unify(r.cdr(u1), r.cdr(v1), s1)
   | ~else:
       u1 === v1 && subst
+
+fun unify_goal(u, v):
+  fun (state :: State) :: Stream:
+    val subst: unify(u, v, state.subst)
+    if subst
+    | [State(state.counter, subst)]
+    | []
+
+fun call_with_fresh_var(proc):
+  fun (state :: State) :: Stream:
+    val var: Var(state.counter)
+    val new_state: State(state.counter + 1, state.subst)
+    proc(var)(new_state)
+
+fun mplus(st0 :: Stream, st1 :: Stream) :: Stream:
+  rs.stream_append(st0, st1)
+
+fun bind(st :: Stream, goal) :: Stream:
+  cond
+  | rs.is_empty_stream(st): []
+  | ~else:
+      mplus(goal(rs.stream_first(st)),
+            bind(rs.stream_rest(st), goal))
+
+// temporary implementations
+fun disj(g0, g1):
+  fun (state :: State) :: Stream:
+    mplus(g0(state), g1(state))
+
+fun conj(g0, g1):
+  fun (state :: State) :: Stream:
+    bind(g0(state), g1)
