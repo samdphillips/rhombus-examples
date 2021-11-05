@@ -15,6 +15,10 @@ import:
     rename:
       #{hash-ref} ~to hash_ref
       #{pair?}    ~to is_Pair
+  racket/stream: prefix rs
+
+annotation.macro 'Stream:
+  annotation_ct.pack_predicate('(rs.#{stream?}))
 
 class Var (i :: Integer)
 val is_Var: #{Var?}
@@ -32,7 +36,7 @@ fun walk(var, subst :: Subst) :: Any:
   | ~else: value
 
 fun unify_goal(u, v):
-  fun (state :: State):
+  fun (state :: State) :: Stream:
     val subst: unify(u, v, state.subst)
     if subst
     | [State(state.counter, subst)]
