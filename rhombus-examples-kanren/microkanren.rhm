@@ -13,8 +13,10 @@ import:
   racket/base:
     prefix r
     rename:
-      #{hash-ref} ~to hash_ref
-      #{pair?}    ~to is_Pair
+      #{hash-ref}        ~to hash_ref
+      #{pair?}           ~to is_Pair
+      #{build-list}      ~to build_list
+      #{procedure-arity} ~to procedure_arity
   racket/stream:
     prefix rs
     rename:
@@ -63,11 +65,26 @@ fun unify_goal(u, v):
     | [State(state.counter, subst)]
     | []
 
-fun call_with_fresh_var(proc):
+operator (u <=> v):
+  ~stronger_than: <&> <|>
+  ~weaker_than: + - * /
+  unify_goal(u, v)
+
+fun call_with_fresh_vars(proc):
+  val num_vars :: Integer: r.procedure_arity(proc)
   fun (state :: State) :: Stream:
-    val var: Var(state.counter)
-    val new_state: State(state.counter + 1, state.subst)
-    proc(var)(new_state)
+    fun make_var(i):
+      Var(state.counter + i)
+    val vars: r.build_list(num_vars, make_var)
+    val new_state: State(state.counter + num_vars, state.subst)
+    r.apply(proc, vars)(new_state)
+
+expr.rule '(fresh ($u, $v, ...):
+              $body ...
+              ...):
+  '(call_with_fresh_vars(fun ($u, $v, ...):
+                           $body ...
+                           ...))
 
 fun mplus(st0 :: Stream, st1 :: Stream) :: Stream:
   rs.stream_append(st0, st1)
@@ -87,3 +104,11 @@ fun disj(g0, g1):
 fun conj(g0, g1):
   fun (state :: State) :: Stream:
     bind(g0(state), g1)
+
+operator (g0 <|> g1):
+  disj(g0, g1)
+
+operator (g0 <&> g1):
+  ~stronger_than: <|>
+  conj(g0, g1)
+
