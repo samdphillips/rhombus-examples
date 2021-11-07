@@ -26,6 +26,7 @@ import:
       #{stream-rest}   ~to stream_rest
       #{stream-cons}   ~to stream_cons
       #{stream-append} ~to stream_append
+      #{stream->list}  ~to stream_to_list
 
 annotation.macro 'Stream:
   annotation_ct.pack_predicate('(rs.is_stream))
@@ -65,8 +66,8 @@ fun unify_goal(u, v):
     | [State(state.counter, subst)]
     | []
 
-operator (u <=> v):
-  ~stronger_than: <&> <|>
+operator (u ≡ v):
+  ~stronger_than: ∧ ∨
   ~weaker_than: + - * /
   unify_goal(u, v)
 
@@ -105,10 +106,15 @@ fun conj(g0, g1):
   fun (state :: State) :: Stream:
     bind(g0(state), g1)
 
-operator (g0 <|> g1):
+operator (g0 ∨ g1):
   disj(g0, g1)
 
-operator (g0 <&> g1):
-  ~stronger_than: <|>
+operator (g0 ∧ g1):
+  ~stronger_than: ∨
   conj(g0, g1)
 
+#//
+val g:
+  fresh (x, y):
+    x ≡ symbol(red) ∧ y ≡ symbol(beans) ∨ \
+    x ≡ symbol(split) ∧ y ≡ symbol(pea)
