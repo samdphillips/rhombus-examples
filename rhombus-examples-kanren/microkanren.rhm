@@ -28,8 +28,29 @@ import:
       #{stream-append} ~to stream_append
       #{stream->list}  ~to stream_to_list
 
+// XXX: if $left is Stream.of(X) is there a way to access X and push it
+// into the RHS of the expansion cases?
+dot.macro '(stream_dot_provider $left $dot $right):
+  match right
+  | 'is_empty: '(rs.is_empty_stream($left))
+  | 'first:    '(rs.stream_first($left))
+  | 'rest:     '(rs.stream_rest($left))
+  | 'to_list:  '(fun () -: List: rs.stream_to_list($left))
+
 annotation.macro 'Stream:
-  annotation_ct.pack_predicate('(rs.is_stream))
+  annotation_ct.pack_predicate('(rs.is_stream),
+                               '(($(dot_ct.provider_key), stream_dot_provider)))
+
+
+dot.macro '(goal_dot_provider $left $dot $right):
+  match right
+  | 'apply: '(fun (state -: State) -: Stream: $left(state))
+
+// Goals are State -> Stream.of(State), we're going to cheat since there isn't
+// arrow annotations yet.
+annotation.macro 'Goal:
+  annotation_ct.pack_predicate('(r.#{procedure?}),
+                               '(($(dot_ct.provider_key), goal_dot_provider)))
 
 class Var (i :: Integer)
 val is_Var: #{Var?}
@@ -71,7 +92,7 @@ operator (u ≡ v):
   ~weaker_than: + - * /
   unify_goal(u, v)
 
-fun call_with_fresh_vars(proc):
+fun call_with_fresh_vars(proc) -: Goal:
   val num_vars :: Integer: r.procedure_arity(proc)
   fun (state :: State) :: Stream:
     fun make_var(i):
@@ -83,19 +104,18 @@ fun call_with_fresh_vars(proc):
 expr.rule '(fresh ($u, $v, ...):
               $body ...
               ...):
-  '(call_with_fresh_vars(fun ($u, $v, ...):
-                           $body ...
-                           ...))
+  '((call_with_fresh_vars(fun ($u, $v, ...):
+                            $body ...
+                            ...)) -: Goal)
 
 fun mplus(st0 :: Stream, st1 :: Stream) :: Stream:
   rs.stream_append(st0, st1)
 
 fun bind(st :: Stream, goal) :: Stream:
   cond
-  | rs.is_empty_stream(st): []
+  | st.is_empty: []
   | ~else:
-      mplus(goal(rs.stream_first(st)),
-            bind(rs.stream_rest(st), goal))
+      mplus(goal(st.first), bind(st.rest, goal))
 
 // temporary implementations
 fun disj(g0, g1):
@@ -113,8 +133,7 @@ operator (g0 ∧ g1):
   ~stronger_than: ∨
   conj(g0, g1)
 
-#//
-val g:
+val g -: Goal:
   fresh (x, y):
     x ≡ symbol(red) ∧ y ≡ symbol(beans) ∨ \
     x ≡ symbol(split) ∧ y ≡ symbol(pea)
