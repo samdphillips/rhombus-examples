@@ -28,8 +28,8 @@ import:
       #{stream-append} ~to stream_append
       #{stream->list}  ~to stream_to_list
 
-// XXX: if $left is Stream.of(X) is there a way to access X and push it
-// into the RHS of the expansion cases?
+// XXX: if $left is annotated Stream.of(X) is there a way to access X and
+// push it into the RHS of the expansion cases?
 dot.macro '(stream_dot_provider $left $dot $right):
   match right
   | 'is_empty: '(rs.is_empty_stream($left))
@@ -123,7 +123,7 @@ fun disj(g0 -: Goal, g1 -: Goal) -: Goal:
     mplus(g0(state), g1(state))
 
 fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
-  fun (state :: State) :: Stream:
+  fun (state -: State) -: Stream:
     bind(g0(state), g1)
 
 operator (g0 ∨ g1):
