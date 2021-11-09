@@ -35,6 +35,7 @@ dot.macro '(stream_dot_provider $left $dot $right):
   | 'is_empty: '(rs.is_empty_stream($left))
   | 'first:    '(rs.stream_first($left))
   | 'rest:     '(rs.stream_rest($left))
+  | 'take:     '(fun (i) -: Stream: rs.#{stream-take}($left, i))
   | 'to_list:  '(fun () -: List: rs.stream_to_list($left))
 
 annotation.macro 'Stream:
@@ -109,27 +110,30 @@ expr.rule '(fresh ($u, $v, ...):
                             ...)) -: Goal)
 
 fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
-  rs.stream_append(st0, st1)
+  cond
+  | st0.is_empty: st1
+  | ~else:
+      rs.stream_cons(st0.first, mplus(st1, st0.rest))
 
 fun bind(st -: Stream, goal -: Goal) -: Stream:
   cond
   | st.is_empty: []
   | ~else:
-      mplus(goal(st.first), bind(st.rest, goal))
+      rs.mplus(goal(st.first), bind(st.rest, goal))
 
 // temporary implementations
 fun disj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state -: State) -: Stream:
-    mplus(g0(state), g1(state))
+    rs.mplus(g0(state), g1(state))
 
 fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state -: State) -: Stream:
     bind(g0(state), g1)
 
-operator (g0 ∨ g1):
+operator ((g0 -: Goal) ∨ (g1 -: Goal)) -: Goal:
   disj(g0, g1)
 
-operator (g0 ∧ g1):
+operator ((g0 -: Goal) ∧ (g1 -: Goal)) -: Goal:
   ~stronger_than: ∨
   conj(g0, g1)
 
@@ -137,3 +141,16 @@ val g:
   fresh (x, y):
     x ≡ symbol(red) ∧ y ≡ symbol(beans)
       ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
+
+expr.rule '(zzz($g ...)):
+  '(fun (state -: State) -: Stream: rs.#{stream*}(($g ...)(state)))
+
+fun fives(x :: Var) -: Goal:
+  x ≡ 5 ∨ zzz(fives(x))
+
+fun sixes(x :: Var) -: Goal:
+  x ≡ 6 ∨ zzz(sixes(x))
+
+val fives_and_sixes -: Goal:
+  fresh (v):
+    fives(v) ∨ sixes(v)
