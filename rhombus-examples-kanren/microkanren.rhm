@@ -60,14 +60,14 @@ class State (counter :: Integer, subst :: Subst)
 
 val empty_state :: State: State(0, {})
 
-fun walk(var, subst :: Subst) :: Any:
+fun walk(var, subst -: Subst) -: Any:
   val value: r.hash_ref(subst, var, #false)
   cond
   | is_Var(value): walk(value, subst)
   | r.not(value): var
   | ~else: value
 
-fun unify(u, v, subst :: Subst):
+fun unify(u, v, subst -: Subst):
   val u1: walk(u, subst)
   val v1: walk(v, subst)
   cond
@@ -80,8 +80,8 @@ fun unify(u, v, subst :: Subst):
   | ~else:
       u1 === v1 && subst
 
-fun unify_goal(u, v):
-  fun (state :: State) :: Stream:
+fun unify_goal(u, v) -: Goal:
+  fun (state -: State) -: Stream:
     val subst: unify(u, v, state.subst)
     if subst
     | [State(state.counter, subst)]
@@ -94,7 +94,7 @@ operator (u ≡ v):
 
 fun call_with_fresh_vars(proc) -: Goal:
   val num_vars :: Integer: r.procedure_arity(proc)
-  fun (state :: State) :: Stream:
+  fun (state -: State) -: Stream:
     fun make_var(i):
       Var(state.counter + i)
     val vars: r.build_list(num_vars, make_var)
@@ -108,21 +108,21 @@ expr.rule '(fresh ($u, $v, ...):
                             $body ...
                             ...)) -: Goal)
 
-fun mplus(st0 :: Stream, st1 :: Stream) :: Stream:
+fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
   rs.stream_append(st0, st1)
 
-fun bind(st :: Stream, goal) :: Stream:
+fun bind(st -: Stream, goal -: Goal) -: Stream:
   cond
   | st.is_empty: []
   | ~else:
       mplus(goal(st.first), bind(st.rest, goal))
 
 // temporary implementations
-fun disj(g0, g1):
-  fun (state :: State) :: Stream:
+fun disj(g0 -: Goal, g1 -: Goal) -: Goal:
+  fun (state -: State) -: Stream:
     mplus(g0(state), g1(state))
 
-fun conj(g0, g1):
+fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state :: State) :: Stream:
     bind(g0(state), g1)
 
@@ -133,7 +133,7 @@ operator (g0 ∧ g1):
   ~stronger_than: ∨
   conj(g0, g1)
 
-val g -: Goal:
+val g:
   fresh (x, y):
-    x ≡ symbol(red) ∧ y ≡ symbol(beans) ∨ \
-    x ≡ symbol(split) ∧ y ≡ symbol(pea)
+    x ≡ symbol(red) ∧ y ≡ symbol(beans)
+      ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
