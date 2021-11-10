@@ -119,12 +119,12 @@ fun bind(st -: Stream, goal -: Goal) -: Stream:
   cond
   | st.is_empty: []
   | ~else:
-      rs.mplus(goal(st.first), bind(st.rest, goal))
+      mplus(goal(st.first), bind(st.rest, goal))
 
 // temporary implementations
 fun disj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state -: State) -: Stream:
-    rs.mplus(g0(state), g1(state))
+    mplus(g0(state), g1(state))
 
 fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state -: State) -: Stream:
