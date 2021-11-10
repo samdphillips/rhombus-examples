@@ -22,7 +22,7 @@ r.random_seed(0xDEC777)
 operator (a ^ b):
   ~stronger_than: * / + - <=
   ~associativity: ~right
-  r.expt(a, b)
+  expt(a, b)
 
 operator (a % b):
   ~weaker_than: * /
@@ -79,10 +79,10 @@ fun distance(width, height, Posn(x0, y0), Posn(x1, y1)):
   fun step(d, cur_distsq, cur_d):
     cond
     | r.is_null(d):
-        val dist: r.sqrt(cur_distsq)
+        val dist: sqrt(cur_distsq)
         values(dist,
-               Posn (r.exact(r.round(cur_d.x / dist)),
-                     r.exact(r.round(cur_d.y / dist))))
+               Posn (r.exact(round(cur_d.x / dist)),
+                     r.exact(round(cur_d.y / dist))))
     | ~else:
         val dx: (x1 + d[0].x * width) - x0
         val dy: (y1 + d[0].y * height) - y0
