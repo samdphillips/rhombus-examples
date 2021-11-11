@@ -17,31 +17,10 @@ import:
       #{pair?}           ~to is_Pair
       #{build-list}      ~to build_list
       #{procedure-arity} ~to procedure_arity
-  racket/stream:
-    prefix rs
-    rename:
-      #{stream-empty?} ~to is_empty_stream
-      #{stream?}       ~to is_stream
-      #{stream-first}  ~to stream_first
-      #{stream-rest}   ~to stream_rest
-      #{stream-cons}   ~to stream_cons
-      #{stream-append} ~to stream_append
-      #{stream->list}  ~to stream_to_list
-
-// XXX: if $left is annotated Stream.of(X) is there a way to access X and
-// push it into the RHS of the expansion cases?
-dot.macro '(stream_dot_provider $left $dot $right):
-  match right
-  | 'is_empty: '(rs.is_empty_stream($left))
-  | 'first:    '(rs.stream_first($left))
-  | 'rest:     '(rs.stream_rest($left))
-  | 'take:     '(fun (i) -: Stream: rs.#{stream-take}($left, i))
-  | 'to_list:  '(fun () -: List: rs.stream_to_list($left))
-
-annotation.macro 'Stream:
-  annotation_ct.pack_predicate('(rs.is_stream),
-                               '(($(dot_ct.provider_key), stream_dot_provider)))
-
+  lib("rhombus/compat/stream.rhm"):
+    prefix streamlib
+    expose:
+      Stream
 
 dot.macro '(goal_dot_provider $left $dot $right):
   match right
@@ -113,7 +92,7 @@ fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
   cond
   | st0.is_empty: st1
   | ~else:
-      rs.stream_cons(st0.first, mplus(st1, st0.rest))
+      streamlib.stream_cons(st0.first, mplus(st1, st0.rest))
 
 fun bind(st -: Stream, goal -: Goal) -: Stream:
   cond
@@ -143,7 +122,7 @@ val g:
       ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
 
 expr.rule '(zzz($g ...)):
-  '(fun (state -: State) -: Stream: rs.#{stream*}(($g ...)(state)))
+  '(fun (state -: State) -: Stream: streamlib.#{stream*}(($g ...)(state)))
 
 fun fives(x :: Var) -: Goal:
   x ≡ 5 ∨ zzz(fives(x))
