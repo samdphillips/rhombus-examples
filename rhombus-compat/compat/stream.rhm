@@ -6,6 +6,12 @@ import:
     rename:
       #{stream-cons} ~to stream_cons
 
+export:
+  Stream
+  stream.stream_cons
+  // XXX: not sure what a better name for this would be
+  stream.#{stream*}
+
 annotation.macro 'Stream:
   annotation_ct.pack_predicate('(rs.#{stream?}),
                                '(($(dot_ct.provider_key), stream_dot_provider)))
@@ -19,9 +25,3 @@ dot.macro '(stream_dot_provider $left $dot $right):
   | 'rest:     '(stream.#{stream-rest}($left))
   | 'take:     '(fun (i) -: Stream: stream.#{stream-take}($left, i))
   | 'to_list:  '(fun () -: List: stream.#{stream->list}($left))
-
-export:
-  Stream
-  stream.stream_cons
-  // XXX: not sure what a better name for this would be
-  stream.#{stream*}
