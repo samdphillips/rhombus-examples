@@ -14,7 +14,7 @@ import:
     prefix r
     rename:
       #{hash-ref}        ~to hash_ref
-      #{pair?}           ~to is_Pair
+      #{pair?}           ~to is_pair
       #{build-list}      ~to build_list
       #{procedure-arity} ~to procedure_arity
   lib("rhombus/compat/stream.rhm"):
@@ -22,44 +22,52 @@ import:
     expose:
       Stream
 
+
+// Goals are State -> Stream.of(State), this implementation cheats since
+// there isn't arrow annotations yet.
 dot.macro '(goal_dot_provider $left $dot $right):
   match right
-  | 'apply: '(fun (state -: State) -: Stream: $left(state))
+  | 'apply:       '(fun (state -: State) -: Stream: $left(state))
+  | 'apply_empty: '(fun () -: Stream: $left.apply(empty_state))
 
-// Goals are State -> Stream.of(State), we're going to cheat since there isn't
-// arrow annotations yet.
 annotation.macro 'Goal:
   annotation_ct.pack_predicate('(r.#{procedure?}),
                                '(($(dot_ct.provider_key), goal_dot_provider)))
 
 class Var (i :: Integer)
-val is_Var: #{Var?}
+val is_var: #{Var?}
 
 annotation.macro 'Subst: '(Map.of(Var, Any))
 class State (counter :: Integer, subst :: Subst)
 
 val empty_state :: State: State(0, {})
 
+
+// walk: finds the current value (if any) for a variable in the Subst
 fun walk(var, subst -: Subst) -: Any:
   val value: r.hash_ref(subst, var, #false)
   cond
-  | is_Var(value): walk(value, subst)
+  | is_var(value): walk(value, subst)
   | r.not(value): var
   | ~else: value
 
+
+// unify: attempts to unify two terms
 fun unify(u, v, subst -: Subst):
   val u1: walk(u, subst)
   val v1: walk(v, subst)
   cond
-  | is_Var(u1) && is_Var(v1) && u1 === v1: subst
-  | is_Var(u1): subst ++ {u1: v1}
-  | is_Var(v1): subst ++ {v1: u1}
-  | r.is_Pair(u1) && r.is_Pair(v1):
+  | is_var(u1) && is_var(v1) && u1 === v1: subst
+  | is_var(u1): subst ++ {u1: v1}
+  | is_var(v1): subst ++ {v1: u1}
+  | r.is_pair(u1) && r.is_pair(v1):
       val s1: unify(r.car(u1), r.car(v1), subst)
       s1 && unify(r.cdr(u1), r.cdr(v1), s1)
   | ~else:
       u1 === v1 && subst
 
+
+// unify_goal: construct a goal unifying two terms
 fun unify_goal(u, v) -: Goal:
   fun (state -: State) -: Stream:
     val subst: unify(u, v, state.subst)
@@ -67,11 +75,16 @@ fun unify_goal(u, v) -: Goal:
     | [State(state.counter, subst)]
     | []
 
+
+// sugar for unify_goal
 operator (u ≡ v):
   ~stronger_than: ∧ ∨
   ~weaker_than: + - * /
   unify_goal(u, v)
 
+
+// call_with_fresh_vars: allocate some fresh variables and pass them to
+// the procedure argument
 fun call_with_fresh_vars(proc) -: Goal:
   val num_vars :: Integer: r.procedure_arity(proc)
   fun (state -: State) -: Stream:
@@ -81,6 +94,8 @@ fun call_with_fresh_vars(proc) -: Goal:
     val new_state: State(state.counter + num_vars, state.subst)
     r.apply(proc, vars)(new_state)
 
+
+// sugar for `call_with_fresh_vars`
 expr.rule '(fresh ($u, $v, ...):
               $body ...
               ...):
@@ -88,48 +103,77 @@ expr.rule '(fresh ($u, $v, ...):
                             $body ...
                             ...)) -: Goal)
 
+
+// mplus: Monadic plus for the Stream of answers.  Similar to the paper this
+// implementation alternates the two input streams allowing for breadth first
+// search.
 fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
   cond
   | st0.is_empty: st1
   | ~else:
       streamlib.stream_cons(st0.first, mplus(st1, st0.rest))
 
+
+// bind: Monadic bind for the Stream of answers.
 fun bind(st -: Stream, goal -: Goal) -: Stream:
   cond
   | st.is_empty: []
   | ~else:
       mplus(goal(st.first), bind(st.rest, goal))
 
-// temporary implementations
+
+// disj: construct a disjunction goal from two goals
 fun disj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state -: State) -: Stream:
     mplus(g0(state), g1(state))
 
+
+// conj: construct a conjunction goal from two goals
 fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
   fun (state -: State) -: Stream:
     bind(g0(state), g1)
 
+
+// zzz: snooze operator, delays creating a goal
+expr.rule '(zzz($g ...)):
+    '(fun (state -: State) -: Stream: streamlib.#{stream*}(($g ...)(state)))
+
+
 operator ((g0 -: Goal) ∨ (g1 -: Goal)) -: Goal:
   disj(g0, g1)
+
 
 operator ((g0 -: Goal) ∧ (g1 -: Goal)) -: Goal:
   ~stronger_than: ∨
   conj(g0, g1)
 
+
+#//
+expr.rule '($g0 ∨ $g1):
+  '(disj($g0, zzz($g1)))
+
+#//
+expr.rule '($g0 ∧ $g1 ...):
+  ~stronger_than: ∨
+  '(conj($g0, zzz($g1 ...)))
+
+// --------- Examples -----------
+
+#//
 val g:
   fresh (x, y):
     x ≡ symbol(red) ∧ y ≡ symbol(beans)
       ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
 
-expr.rule '(zzz($g ...)):
-  '(fun (state -: State) -: Stream: streamlib.#{stream*}(($g ...)(state)))
-
+#//
 fun fives(x :: Var) -: Goal:
   x ≡ 5 ∨ zzz(fives(x))
 
+#//
 fun sixes(x :: Var) -: Goal:
   x ≡ 6 ∨ zzz(sixes(x))
 
+#//
 val fives_and_sixes -: Goal:
   fresh (v):
     fives(v) ∨ sixes(v)
