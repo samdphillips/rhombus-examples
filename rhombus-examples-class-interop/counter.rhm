@@ -1,0 +1,44 @@
+#lang rhombus
+
+import:
+  racket/base:
+    rename:
+      #{set-box!} ~to set_box
+  racket/gui
+
+val b: base.box(0)
+
+fun update_val(d):
+  base.set_box(b, d + base.unbox(b))
+  update_label()
+
+fun format_label():
+  base.format("~a", base.unbox(b))
+
+fun update_label():
+  label.#{set-label}(format_label())
+
+val w: new gui.#{frame%}(~label: "counter",
+                         ~width: 200)
+
+val hpane: new gui.#{horizontal-pane%}(~parent: w)
+
+val sub1: new gui.#{button%}(~parent: hpane,
+                             ~label: "-",
+                             #{#:stretchable-width}: #true,
+                             ~callback:
+                               fun (btn, evt):
+                                 update_val(-1))
+
+val label: new gui.#{message%}(~parent: hpane,
+                               #{#:auto-resize}: #true,
+                               ~label: format_label())
+
+val plus1: new gui.#{button%}(~parent: hpane,
+                              ~label: "+",
+                              #{#:stretchable-width}: #true,
+                              ~callback:
+                                fun (btn, evt):
+                                  update_val(1))
+
+w.show(#true)
