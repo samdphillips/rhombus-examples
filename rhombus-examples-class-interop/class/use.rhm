@@ -1,0 +1,15 @@
+#lang rhombus
+
+import:
+  racket/base
+  "../class.rkt": no_prefix
+  "decl.rkt": no_prefix
+
+val a: new Add(~left: 3, ~right: 4)
+val b: new Sub(~left: 32, ~right: 30)
+
+base.exit(if a.eval() == 7 && b.eval() == 2
+          | 0
+          | base.displayln("oops")
+            1)
+

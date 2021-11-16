@@ -4,6 +4,7 @@ import:
   racket/base:
     rename:
       #{set-box!} ~to set_box
+  "../class.rkt": no_prefix
   racket/gui
 
 val b: base.box(0)
