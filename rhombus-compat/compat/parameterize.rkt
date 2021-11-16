@@ -10,6 +10,7 @@
 (begin-for-syntax
   (define-syntax-class :binding
     #:datum-literals (block group)
+    #:attributes (name expr)
     (pattern (group name:identifier (block (~and expr (group e ...)))))))
 
 (define-syntax rhombus-parameterize
