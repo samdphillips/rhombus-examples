@@ -17,7 +17,7 @@ import:
       #{pair?}           ~to is_pair
       #{build-list}      ~to build_list
       #{procedure-arity} ~to procedure_arity
-  lib("rhombus/compat/stream.rhm"):
+  rhombus/compat/stream:
     prefix streamlib
     expose:
       Stream
