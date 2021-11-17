@@ -1,20 +1,17 @@
 #lang rhombus
 
-export: dict
-        dict_dot_provider
-        Dict
-
 import:
   rhombus/macro: no_prefix
   racket/dict:
-    prefix dict
     rename:
       #{dict-ref} ~to ref
       #{dict-set} ~to set
       #{dict?} ~to is_dict
 
-  racket/base:
-    prefix r
+export:
+  all_in(dict)
+  dict_dot_provider
+  Dict
 
 annotation.macro 'Dict:
   annotation_ct.pack_predicate('(dict.#{is_dict}),

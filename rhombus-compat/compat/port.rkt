@@ -1,21 +1,16 @@
 #lang rhombus
 
-export:
-  port_dot_provider
-  Port
-
 import:
   rhombus/macro: no_prefix
-  racket/control
   racket/base:
     prefix r
     rename:
-      #{call/cc} ~to callcc
-      #{regexp-match} ~to regexp_match
       #{close-input-port} ~to close_input_port
       #{close-output-port} ~to close_output_port
-      #{current-custodian} ~to current_custodian
-      #{custodian-shutdown-all} ~to custodian_shutdown_all
+
+export:
+  port_dot_provider
+  Port
 
 fun close_port(p):
  if r.#{input-port?}(p)

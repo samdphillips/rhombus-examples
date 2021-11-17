@@ -1,8 +1,12 @@
 #lang rhombus
 
-export: Thread thread_dot_provider thread
 import: rhombus/macro: no_prefix
         racket/base: prefix r
+
+export:
+  Thread
+  thread_dot_provider
+  thread
 
 annotation.macro 'Thread:
   annotation_ct.pack_predicate('(r.#{thread?}),
@@ -11,7 +15,6 @@ dot.macro '(thread_dot_provider $left $dot $right):
   match right
   // One argument functions
   | 'kill: '(r.#{kill-thread}($left))
-
 
 expr.rule '(thread: $body ... ; ...):
   '(r.thread(fun (): $body ... ; ...))
