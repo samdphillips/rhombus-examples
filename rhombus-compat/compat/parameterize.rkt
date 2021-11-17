@@ -10,7 +10,10 @@
 (begin-for-syntax
   (define-syntax-class :binding
     #:datum-literals (block group)
-    (pattern (group name ... (block (~and expr (group e ...)))))))
+    #:attributes (name expr)
+    (pattern
+      (group n ... (block (~and expr (group e ...))))
+      #:attr name (syntax/loc #'(n ...) (group n ...)))))
 
 (define-syntax rhombus-parameterize
   (expression-transformer
@@ -22,7 +25,7 @@
                  ((~and tag-body block) body ...)
                  . tail)
         (values
-         #'(parameterize ([(rhombus-expression (group bindings.name ...))
+         #'(parameterize ([(rhombus-expression bindings.name)
                            (rhombus-expression bindings.expr)] ...)
              (rhombus-body-at tag-body body ...))
          #'tail)]
