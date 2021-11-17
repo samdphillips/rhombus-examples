@@ -1,6 +1,6 @@
 #lang rhombus
 
-export: 
+export:
   port_dot_provider
   Port
 
@@ -16,16 +16,14 @@ import:
       #{close-output-port} ~to close_output_port
       #{current-custodian} ~to current_custodian
       #{custodian-shutdown-all} ~to custodian_shutdown_all
-  
+
 fun close_port(p):
  if r.#{input-port?}(p)
  | r.close_input_port(p)
  | r.close_output_port(p)
 
-
 fun is_port(p): r.#{input-port?}(p) || r.#{output-port?}(p)
 
- 
 annotation.macro 'Port:
   annotation_ct.pack_predicate('is_port,
                                '(($(dot_ct.provider_key), port_dot_provider)))
