@@ -8,8 +8,8 @@ export:
   loop
   letcc
 
-import: racket/base: prefix r
-        rhombus/macro: no_prefix
+import: racket/base as r
+        rhombus/macro open
 
 expr.rule '(letcc $k: $body ...; ...):
   '(r.#{call/cc}(fun($k): $body ...; ...))

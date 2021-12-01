@@ -4,4 +4,4 @@ export: xml
 import:
   xml:
     rename:
-      #{xexpr->string} ~to to_string
+      #{xexpr->string} as to_string

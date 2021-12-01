@@ -2,11 +2,10 @@
 
 import:
   net/url:
-    prefix url
     rename:
-      #{string->url} ~to from_string
-      #{url-path} ~to path
-      #{url-query} ~to query
-      #{path/param-path} ~to param_path
+      #{string->url}     as from_string
+      #{url-path}        as path
+      #{url-query}       as query
+      #{path/param-path} as param_path
 
 export: url

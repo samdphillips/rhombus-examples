@@ -6,12 +6,12 @@ export:
   tcp_dot_provider
 
 import:
-  rhombus/macro: no_prefix
+  rhombus/macro open
   racket/tcp:
     rename:
-      #{tcp-listen} ~to listen
-      #{tcp-accept} ~to accept
-      #{tcp-close} ~to close
+      #{tcp-listen} as listen
+      #{tcp-accept} as accept
+      #{tcp-close}  as close
 
 annotation.macro 'Tcp:
   annotation_ct.pack_predicate('(tcp.#{tcp-listener?}),

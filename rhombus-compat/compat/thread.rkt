@@ -1,7 +1,8 @@
 #lang rhombus
 
-import: rhombus/macro: no_prefix
-        racket/base: prefix r
+import:
+  rhombus/macro open
+  racket/base as r
 
 export:
   Thread

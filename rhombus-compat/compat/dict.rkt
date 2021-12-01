@@ -1,12 +1,12 @@
 #lang rhombus
 
 import:
-  rhombus/macro: no_prefix
+  rhombus/macro open
   racket/dict:
     rename:
-      #{dict-ref} ~to ref
-      #{dict-set} ~to set
-      #{dict?} ~to is_dict
+      #{dict-ref} as ref
+      #{dict-set} as set
+      #{dict?}    as is_dict
 
 export:
   all_in(dict)

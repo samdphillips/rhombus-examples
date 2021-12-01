@@ -13,7 +13,7 @@ export:
   stream.#{stream*}
 
 annotation.macro 'Stream:
-  annotation_ct.pack_predicate('(rs.#{stream?}),
+  annotation_ct.pack_predicate('(stream.#{stream?}),
                                '(($(dot_ct.provider_key), stream_dot_provider)))
 
 // XXX: if $left is annotated Stream.of(X) is there a way to access X and

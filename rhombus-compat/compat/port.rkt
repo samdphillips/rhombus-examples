@@ -1,12 +1,11 @@
 #lang rhombus
 
 import:
-  rhombus/macro: no_prefix
-  racket/base:
-    prefix r
+  rhombus/macro open
+  racket/base as r:
     rename:
-      #{close-input-port} ~to close_input_port
-      #{close-output-port} ~to close_output_port
+      #{close-input-port}  as close_input_port
+      #{close-output-port} as close_output_port
 
 export:
   port_dot_provider

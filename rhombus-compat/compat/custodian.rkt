@@ -1,15 +1,15 @@
 #lang rhombus
 
 import:
-  rhombus/macro: no_prefix
+  rhombus/macro open
 
-  racket/base:
-    prefix custodian
+  racket/base as r
+  racket/base as custodian:
     rename:
-      #{current-custodian} ~to current
-      #{custodian-shutdown-all} ~to shutdown
-      #{make-custodian} ~to make
-      #{custodian-limit-memory} ~to limit_memory
+      #{current-custodian}      as current
+      #{custodian-shutdown-all} as shutdown
+      #{make-custodian}         as make
+      #{custodian-limit-memory} as limit_memory
     only:
       current
       shutdown

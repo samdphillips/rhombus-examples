@@ -4,11 +4,10 @@
 // https://github.com/soegaard/rhombus-experiments/blob/main/spelling-corrector/string.rkt
 
 import:
-  racket/base:
-    prefix string
+  racket/base as string:
     rename:
-      #{string->number} ~to to_number
-      #{string-append} ~to sappend
+      #{string->number} as to_number
+      #{string-append}  as sappend
 
 
 operator(a ++ b):

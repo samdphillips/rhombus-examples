@@ -3,6 +3,7 @@
 import:
   racket/format:
     rename:
-      #{~a} ~to a
+      #{~a} as a
+      #{~r} as r
 
 export: format
