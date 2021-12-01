@@ -1,14 +1,13 @@
 #lang rhombus
 
 import:
-  rhombus/macro: no_prefix
-  racket/base:
-    prefix r
+  rhombus/macro open
+  racket/base as r:
     rename:
-      #{null?}          ~to is_null
-      #{inexact->exact} ~to exact
-      #{random-seed}    ~to random_seed
-  racket/list: prefix l
+      #{null?}          as is_null
+      #{inexact->exact} as exact
+      #{random-seed}    as random_seed
+  racket/list as l
 
 class Posn(x,y)
 class Sheep(p :: Posn)
@@ -104,7 +103,7 @@ val posn: match entity
 val scores: Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
 fun update_score(d :: Posn, v :: Number):
   val i: d.x + 1 + 3 * (d.y + 1)
-  scores[i] = scores[i] + v
+  scores[i] := scores[i] + v
 
 fun calculate_scores(others):
   cond

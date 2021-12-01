@@ -1,10 +1,10 @@
 #lang rhombus
 
 import:
-  rhombus/macro: no_prefix
+  rhombus/macro open
   racket/stream:
     rename:
-      #{stream-cons} ~to stream_cons
+      #{stream-cons} as stream_cons
 
 export:
   Stream

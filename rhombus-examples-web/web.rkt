@@ -1,10 +1,10 @@
 #lang rhombus
 
 import:
-  "web/private/disposable.rkt": prefix d
+  "web/private/disposable.rkt" as d
+  "web/private/racket.rkt" as rkt
   "web/private/http.rkt"
   "web/private/keyring.rkt"
-  "web/private/racket.rkt": prefix rkt
   "web/private/url.rkt"
 
 val user_name: rkt.argv[0]

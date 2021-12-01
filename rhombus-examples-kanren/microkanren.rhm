@@ -8,17 +8,15 @@
 */
 
 import:
-  // Don't forget rhombus/macro or annotations and stuff fail
-  rhombus/macro: no_prefix
-  racket/base:
-    prefix r
+  // Don't forget rhombus/macro or annotations and stuff are harder to type
+  rhombus/macro open
+  racket/base as r:
     rename:
-      #{hash-ref}        ~to hash_ref
-      #{pair?}           ~to is_pair
-      #{build-list}      ~to build_list
-      #{procedure-arity} ~to procedure_arity
-  rhombus/compat/stream:
-    prefix streamlib
+      #{hash-ref}        as hash_ref
+      #{pair?}           as is_pair
+      #{build-list}      as build_list
+      #{procedure-arity} as procedure_arity
+  rhombus/compat/stream as streamlib:
     expose:
       Stream
 
