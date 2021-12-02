@@ -4,13 +4,13 @@ import:
   rhombus/macro open
   racket/stream:
     rename:
-      #{stream-cons} as stream_cons
+      #{stream-cons}  as cons
+      #{stream-count} as count
+      #{empty-stream} as empty
 
 export:
   Stream
-  stream.stream_cons
-  // XXX: not sure what a better name for this would be
-  stream.#{stream*}
+  all_in(stream)
 
 annotation.macro 'Stream:
   annotation_ct.pack_predicate('(stream.#{stream?}),
@@ -25,3 +25,4 @@ dot.macro '(stream_dot_provider $left $dot $right):
   | 'rest:     '(stream.#{stream-rest}($left))
   | 'take:     '(fun (i) -: Stream: stream.#{stream-take}($left, i))
   | 'to_list:  '(fun () -: List: stream.#{stream->list}($left))
+  | 'count:    '(fun (p): stream.count(p, $left))
