@@ -16,7 +16,7 @@ import:
       #{pair?}           as is_pair
       #{build-list}      as build_list
       #{procedure-arity} as procedure_arity
-  rhombus/compat/stream as streamlib:
+  rhombus/compat/stream:
     expose:
       Stream
 
@@ -109,7 +109,7 @@ fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
   cond
   | st0.is_empty: st1
   | ~else:
-      streamlib.stream_cons(st0.first, mplus(st1, st0.rest))
+      stream.cons(st0.first, mplus(st1, st0.rest))
 
 
 // bind: Monadic bind for the Stream of answers.
@@ -134,7 +134,7 @@ fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
 
 // zzz: snooze operator, delays creating a goal
 expr.rule '(zzz($g ...)):
-    '(fun (state -: State) -: Stream: streamlib.#{stream*}(($g ...)(state)))
+    '(fun (state -: State) -: Stream: stream.#{stream*}(($g ...)(state)))
 
 
 operator ((g0 -: Goal) ∨ (g1 -: Goal)) -: Goal:
