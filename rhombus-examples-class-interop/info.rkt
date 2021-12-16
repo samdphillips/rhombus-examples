@@ -5,6 +5,6 @@
 (define deps
   '("base"
     "gui-lib"
-    "https://github.com/samdphillips/shrubbery-rhombus-0.git#racket-class"))
+    "https://github.com/samdphillips/rhombus-prototype.git#dynamic-dot"))
 (define module-suffixes '(#"rhm"))
 

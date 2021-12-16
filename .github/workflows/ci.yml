@@ -16,7 +16,7 @@ jobs:
         variant: 'CS'
         version: "current"
     - name: install rhombus prototype
-      run: raco pkg install --batch --auto https://github.com/mflatt/shrubbery-rhombus-0.git
+      run: raco pkg install --batch --auto rhombus-prototype
     - name: install Racket compat library
       run: raco pkg install --batch --auto ./rhombus-compat
     - name: install web example
@@ -40,7 +40,7 @@ jobs:
         variant: 'CS'
         version: "current"
     - name: install rhombus prototype (with dynamic-dot patches)
-      run: raco pkg install --batch --auto https://github.com/samdphillips/shrubbery-rhombus-0.git#dynamic-dot
+      run: raco pkg install --batch --auto https://github.com/samdphillips/rhombus-prototype#dynamic-dot
     - name: install Racket compat library
       run: raco pkg install --batch --auto ./rhombus-compat
     - name: install class interop example
