@@ -2,6 +2,10 @@
 
 import:
   rhombus/macro open
+  rhombus/compat/extra:
+    only:
+      when
+    open
   racket/base as r:
     rename:
       #{null?}          as is_null
@@ -27,14 +31,6 @@ operator (a % b):
   ~weaker_than: * /
   ~stronger_than: + -
   r.modulo(a, b)
-
-expr.rule '(when $test ... :
-              $body ...
-              ...):
-  '(if $test ...
-    | $body ...
-      ...
-    | r.void())
 
 // make_world :: width height num_sheep num_sheepdogs -> World
 fun make_world(width :: Integer,

@@ -22,20 +22,20 @@ import:
 
 
 // Goals are State -> Stream.of(State), this implementation cheats since
-// there isn't arrow annotations yet.
-dot.macro '(goal_dot_provider $left $dot $right):
+// there isn't an arrow annotation.
+dot.macro 'goal_dot_provider $left $dot $right':
   match right
-  | 'apply:       '(fun (state -: State) -: Stream: $left(state))
-  | 'apply_empty: '(fun () -: Stream: $left.apply(empty_state))
+  | 'apply':       'fun (state -: State) -: Stream: $left(state)'
+  | 'apply_empty': 'fun () -: Stream: $left.apply(empty_state)'
 
-annotation.macro 'Goal:
-  annotation_ct.pack_predicate('(r.#{procedure?}),
-                               '(($(dot_ct.provider_key), goal_dot_provider)))
+annotation.macro 'Goal':
+  annotation_ct.pack_predicate('r.#{procedure?}',
+                               '($(dot_ct.provider_key), goal_dot_provider)')
 
 class Var (i :: Integer)
 val is_var: #{Var?}
 
-annotation.macro 'Subst: '(Map.of(Var, Any))
+annotation.macro 'Subst': 'Map.of(Var, Any)'
 class State (counter :: Integer, subst :: Subst)
 
 val empty_state :: State: State(0, {})
@@ -96,10 +96,10 @@ fun call_with_fresh_vars(proc) -: Goal:
 // sugar for `call_with_fresh_vars`
 expr.rule '(fresh ($u, $v, ...):
               $body ...
-              ...):
-  '((call_with_fresh_vars(fun ($u, $v, ...):
-                            $body ...
-                            ...)) -: Goal)
+              ...)':
+  '(call_with_fresh_vars(fun ($u, $v, ...):
+                           $body ...
+                           ...)) -: Goal'
 
 
 // mplus: Monadic plus for the Stream of answers.  Similar to the paper this
@@ -133,8 +133,8 @@ fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
 
 
 // zzz: snooze operator, delays creating a goal
-expr.rule '(zzz($g ...)):
-    '(fun (state -: State) -: Stream: stream.#{stream*}(($g ...)(state)))
+expr.rule 'zzz($g ...)':
+  'fun (state -: State) -: Stream: stream.#{stream*}(($g ...)(state))'
 
 
 operator ((g0 -: Goal) ∨ (g1 -: Goal)) -: Goal:
@@ -146,14 +146,14 @@ operator ((g0 -: Goal) ∧ (g1 -: Goal)) -: Goal:
   conj(g0, g1)
 
 
-#//
+/*
 expr.rule '($g0 ∨ $g1):
   '(disj($g0, zzz($g1)))
 
-#//
 expr.rule '($g0 ∧ $g1 ...):
   ~stronger_than: ∨
   '(conj($g0, zzz($g1 ...)))
+*/
 
 // --------- Examples -----------
 

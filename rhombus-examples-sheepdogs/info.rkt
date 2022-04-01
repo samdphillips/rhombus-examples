@@ -4,6 +4,7 @@
 (define collection "rhombus-examples")
 (define deps
   '("base"
-    "rhombus-prototype"))
+    "rhombus-prototype"
+    "rhombus-compat"))
 (define module-suffixes '(#"rhm"))
 
