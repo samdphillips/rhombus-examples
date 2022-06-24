@@ -9,7 +9,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@master
     - name: install racket
-      uses: Bogdanp/setup-racket@v1.6.1
+      uses: Bogdanp/setup-racket@v1.8.1
       with:
         architecture: 'x64'
         distribution: 'full'
