@@ -29,13 +29,14 @@ dot.macro 'goal_dot_provider $left $dot $right':
   | 'apply_empty': 'fun () -: Stream: $left.apply(empty_state)'
 
 annotation.macro 'Goal':
-  annotation_ct.pack_predicate('r.#{procedure?}',
-                               '($(dot_ct.provider_key), goal_dot_provider)')
+  values(annotation_ct.pack_predicate('r.#{procedure?}',
+                                      '(($(dot_ct.provider_key), goal_dot_provider))'),
+         '')
 
 class Var (i :: Integer)
 val is_var: #{Var?}
 
-annotation.macro 'Subst': 'Map.of(Var, Any)'
+annotation.macro 'Subst': values('Map.of(Var, Any)', '')
 class State (counter :: Integer, subst :: Subst)
 
 val empty_state :: State: State(0, {})
@@ -94,9 +95,9 @@ fun call_with_fresh_vars(proc) -: Goal:
 
 
 // sugar for `call_with_fresh_vars`
-expr.rule '(fresh ($u, $v, ...):
+expr.rule 'fresh ($u, $v, ...):
               $body ...
-              ...)':
+              ...':
   '(call_with_fresh_vars(fun ($u, $v, ...):
                            $body ...
                            ...)) -: Goal'
