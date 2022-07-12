@@ -1,21 +1,23 @@
 #lang rhombus
 
-export:
-  tcp
-  Tcp
-  tcp_dot_provider
-
 import:
-  rhombus/macro open
+  rhombus/meta open
   racket/tcp:
     rename:
       #{tcp-listen} as listen
       #{tcp-accept} as accept
       #{tcp-close}  as close
 
+export:
+  all_from(.tcp)
+  Tcp
+  tcp_dot_provider
+
 annotation.macro 'Tcp':
-  annotation_ct.pack_predicate('tcp.#{tcp-listener?}',
-                               '($(dot_ct.provider_key), tcp_dot_provider)')
+  values(annotation_meta.pack_predicate('tcp.#{tcp-listener?}',
+                                        '(($(statinfo_meta.dot_provider_key), tcp_dot_provider))'),
+         '')
+
 dot.macro 'tcp_dot_provider $left $dot $right':
   match right
   // One argument functions
