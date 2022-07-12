@@ -1,7 +1,7 @@
 #lang rhombus
 
 import:
-  rhombus/macro open
+  rhombus/meta open
 
   racket/base as r
   racket/base as custodian:
@@ -17,16 +17,17 @@ import:
       limit_memory
 
 export:
-  all_in(custodian)
+  all_from(.custodian)
   Custodian
   custodian_dot_provider
 
 annotation.macro 'Custodian':
-  annotation_ct.pack_predicate('r.#{custodian?}',
-                               '($(dot_ct.provider_key), custodian_dot_provider)')
+  values(annotation_meta.pack_predicate('r.#{custodian?}',
+                                        '(($(statinfo_meta.dot_provider_key), custodian_dot_provider))'),
+         '')
 
 dot.macro 'custodian_dot_provider $left $dot $right':
   match right
-  // One argument functions
-  | 'limit_memory':  'fun(arg): custodian.limit_memory($left, arg)'
+  | 'limit_memory': 'fun(arg): custodian.limit_memory($left, arg)'
   | 'shutdown': 'fun(): custodian.shutdown($left)'
+
