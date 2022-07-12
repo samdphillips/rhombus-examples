@@ -17,7 +17,8 @@ annotation.macro 'Thread':
 dot.macro 'thread_dot_provider $left $dot $right':
   match right
   // One argument functions
-  | 'kill': 'r.#{kill-thread}($left)'
+  | 'kill': 'fun (): r.#{kill-thread}($left)'
+  | 'wait': 'fun (): r.#{thread-wait}($left)'
 
 expr.rule 'thread: $body':
   'r.thread(fun (): $body)'
