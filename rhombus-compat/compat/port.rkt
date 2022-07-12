@@ -1,7 +1,7 @@
 #lang rhombus
 
 import:
-  rhombus/macro open
+  rhombus/meta open
   racket/base as r:
     rename:
       #{close-input-port}  as close_input_port
@@ -19,13 +19,15 @@ fun close_port(p):
 fun is_port(p): r.#{input-port?}(p) || r.#{output-port?}(p)
 
 annotation.macro 'Port':
-  annotation_ct.pack_predicate('is_port',
-                               '($(dot_ct.provider_key), port_dot_provider)')
+  values(annotation_meta.pack_predicate('is_port',
+                                        '(($(statinfo_meta.dot_provider_key), port_dot_provider))'),
+         '')
+
 dot.macro 'port_dot_provider $left $dot $right':
   match right
-  // One argument functions
-  | 'display':       'fun(arg): r.display(arg,$left)'
-  | 'match':         'fun(arg): r.regexp_match(arg,$left)'
+  | 'display':       'fun(arg): r.display(arg, $left)'
+  | 'match':         'fun(arg): r.regexp_match(arg, $left)'
   | 'close':         'fun (): close_port($left)'
   // this one doesn't work for some reason
   | 'readline':      'fun (): r.#{read-line}($left)'
+
