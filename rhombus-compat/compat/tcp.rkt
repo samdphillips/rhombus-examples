@@ -14,8 +14,10 @@ import:
       #{tcp-close}  as close
 
 annotation.macro 'Tcp':
-  annotation_ct.pack_predicate('tcp.#{tcp-listener?}',
-                               '($(dot_ct.provider_key), tcp_dot_provider)')
+  values(annotation_ct.pack_predicate('tcp.#{tcp-listener?}',
+                                      '(($(dot_ct.provider_key), tcp_dot_provider))'),
+         '')
+
 dot.macro 'tcp_dot_provider $left $dot $right':
   match right
   // One argument functions
