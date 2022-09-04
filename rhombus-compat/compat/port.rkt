@@ -6,10 +6,15 @@ import:
     rename:
       #{close-input-port}  as close_input_port
       #{close-output-port} as close_output_port
+  racket/port as p
 
 export:
   port_dot_provider
   Port
+  input_port_dot_provider
+  InputPort
+  output_port_dot_provider
+  OutputPort
 
 fun close_port(p):
  if r.#{input-port?}(p)
@@ -20,14 +25,37 @@ fun is_port(p): r.#{input-port?}(p) || r.#{output-port?}(p)
 
 annotation.macro 'Port':
   values(annotation_meta.pack_predicate('is_port',
-                                        '(($(statinfo_meta.dot_provider_key), port_dot_provider))'),
+                                        '(($(statinfo_meta.dot_provider_key),
+                                           port_dot_provider))'),
          '')
 
 dot.macro 'port_dot_provider $left $dot $right':
   match right
-  | 'display':       'fun(arg): r.display(arg, $left)'
-  | 'match':         'fun(arg): r.regexp_match(arg, $left)'
   | 'close':         'fun (): close_port($left)'
-  // this one doesn't work for some reason
-  | 'readline':      'fun (): r.#{read-line}($left)'
 
+annotation.macro 'InputPort':
+  values(annotation_meta.pack_predicate('r.#{input-port?}',
+                                        '(($(statinfo_meta.dot_provider_key),
+                                           input_port_dot_provider))'),
+         '')
+
+dot.macro 'input_port_dot_provider $left $dot $right':
+  match right
+  | 'match':         'fun(arg): r.regexp_match(arg, $left)'
+  | 'readline':      'fun (): r.#{read-line}($left)'
+  | 'readline_evt':  'fun (): p.#{read-line-evt}($left)'
+  | 'close':         'fun (): r.#{close-input-port}($left)'
+  | 'close_evt':     'fun (): r.#{port-closed-evt}($left)'
+
+annotation.macro 'OutputPort':
+  values(annotation_meta.pack_predicate('r.#{output-port?}',
+                                        '(($(statinfo_meta.dot_provider_key), output_port_dot_provider))'),
+         '')
+
+dot.macro 'output_port_dot_provider $left $dot $right':
+  match right
+  | 'display':       'fun(arg): r.display(arg, $left)'
+  | 'displayln':     'fun(arg): r.displayln(arg, $left)'
+  | 'flush':         'fun(): r.#{flush-output}($left)'
+  | 'close':         'fun (): r.#{close-output-port}($left)'
+  | 'close_evt':     'fun (): r.#{port-closed-evt}($left)'
