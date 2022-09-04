@@ -4,22 +4,25 @@ import:
   rhombus/meta open
   racket/tcp:
     rename:
-      #{tcp-listen} as listen
-      #{tcp-accept} as accept
-      #{tcp-close}  as close
+      #{tcp-connect} as connect
+      #{tcp-listen}  as listen
+      #{tcp-accept}  as accept
+      #{tcp-close}   as close
 
 export:
   all_from(.tcp)
-  Tcp
-  tcp_dot_provider
+  TcpListener
+  tcp_listener_dot_provider
 
-annotation.macro 'Tcp':
+annotation.macro 'TcpListener':
   values(annotation_meta.pack_predicate('tcp.#{tcp-listener?}',
-                                        '(($(statinfo_meta.dot_provider_key), tcp_dot_provider))'),
+                                        '(($(statinfo_meta.dot_provider_key),
+                                           tcp_listener_dot_provider))'),
          '')
 
-dot.macro 'tcp_dot_provider $left $dot $right':
+dot.macro 'tcp_listener_dot_provider $left $dot $right':
   match right
   // One argument functions
-  | 'close':  'fun(): tcp.close($left)'
-  | 'accept': 'fun(): tcp.accept($left)'
+  | 'close':      'fun(): tcp.close($left)'
+  | 'accept':     'fun(): tcp.accept($left)'
+  | 'accept_evt': 'fun (): tcp.#{tcp-accept-evt}($left)'
