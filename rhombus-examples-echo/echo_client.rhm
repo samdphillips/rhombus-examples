@@ -1,0 +1,38 @@
+#lang rhombus/static
+
+import:
+  racket/base:
+    rename:
+      #{dynamic-wind} as dynamic_wind
+    expose:
+      dynamic_wind
+      random
+      sleep
+      void
+  rhombus/compat/extra:
+    expose:
+      thunk
+      unless
+  rhombus/compat/port
+  rhombus/compat/tcp
+
+fun run(count, inp -: port.InputPort, outp -: port.OutputPort):
+  unless (count == 0):
+    outp.displayln("ping " +& count)
+    outp.flush()
+    displayln("sent: " +& count)
+    displayln("received: " +& inp.readline())
+    sleep(random(5))
+    run(count - 1, inp, outp)
+
+fun start(count = 10):
+  val values(inp :: port.InputPort, outp :: port.OutputPort): tcp.connect("localhost", 12777)
+  dynamic_wind(
+    void,
+    thunk:
+      run(count, inp, outp),
+    thunk:
+      inp.close()
+      outp.close())
+
+start()
