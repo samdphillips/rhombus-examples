@@ -1,5 +1,9 @@
 #lang rhombus
 
+
+import: racket/base as r
+        rhombus/meta open
+
 export:
   |>
   when
@@ -7,9 +11,6 @@ export:
   thunk
   loop
   letcc
-
-import: racket/base as r
-        rhombus/macro open
 
 expr.rule 'letcc $k: $body':
   'r.#{call/cc}(fun($k): $body)'
