@@ -1,7 +1,7 @@
 #lang rhombus
 
 import:
-  rhombus/macro open
+  rhombus/meta open
   racket/stream:
     rename:
       #{stream-cons}  as cons
@@ -9,12 +9,12 @@ import:
       #{empty-stream} as empty
 
 export:
+  all_from(.stream)
   Stream
-  all_in(stream)
 
 annotation.macro 'Stream':
-  values(annotation_ct.pack_predicate('stream.#{stream?}',
-                                      '(($(dot_ct.provider_key), stream_dot_provider))'),
+  values(annotation_meta.pack_predicate('stream.#{stream?}',
+                                        '(($(statinfo_meta.dot_provider_key), stream_dot_provider))'),
          '')
 
 // XXX: if $left is annotated Stream.of(X) is there a way to access X and
