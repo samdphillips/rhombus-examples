@@ -8,6 +8,8 @@ export:
   Thread
   thread_dot_provider
   thread
+  rename:
+    r.#{current-thread} as current
 
 annotation.macro 'Thread':
   values(annotation_meta.pack_predicate('r.#{thread?}',
