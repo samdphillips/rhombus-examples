@@ -1,7 +1,7 @@
 #lang rhombus
 
 import:
-  rhombus/macro open
+  rhombus/meta open
   rhombus/compat/extra:
     only:
       when
