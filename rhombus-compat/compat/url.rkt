@@ -8,4 +8,6 @@ import:
       #{url-query}       as query
       #{path/param-path} as param_path
 
-export: url
+export:
+  all_from(.url)
+
