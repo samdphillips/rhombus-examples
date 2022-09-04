@@ -1,0 +1,62 @@
+#lang rhombus/static
+
+import:
+  rhombus/meta open
+  racket/base:
+    rename:
+      #{eof-object?}  as is_eof
+      #{choice-evt}   as choice_evt
+      #{guard-evt}    as guard_evt
+      #{handle-evt}   as handle_evt
+      #{make-channel} as make_channel
+    expose:
+      choice_evt
+      guard_evt
+      handle_evt
+      make_channel
+      sync
+      void
+  rhombus/compat/port
+  rhombus/compat/tcp
+  rhombus/compat/thread
+
+expr.macro 'select_evt
+            | $evt_expr ... ($evt_args, ...):
+                $evt_handler
+            | ...':
+  values('sync(handle_evt($evt_expr ..., fun ($evt_args, ...): $evt_handler), ...)', '')
+
+val shutdown_ch: make_channel()
+val shutdown_evt: guard_evt(fun (): shutdown_ch)
+val listener :: tcp.TcpListener: tcp.listen(12777)
+val listener_evt: listener.accept_evt()
+
+fun handle_client_connection(n, inp -: port.InputPort, outp -: port.OutputPort):
+  val close_evt: choice_evt(inp.close_evt(), outp.close_evt())
+  fun echo():
+    select_evt
+    | close_evt (_ignore):
+        displayln(n +& " closing on closed port")
+        inp.close()
+        outp.close()
+    | inp.readline_evt() (line):
+        displayln(n +& " received: " +& line)
+        if (base.is_eof(line))
+        | displayln(n +& " closing on eof")
+          inp.close()
+          outp.close()
+        | outp.displayln(line)
+          outp.flush()
+          echo()
+  echo()
+  displayln(n +& " exiting client thread")
+
+fun run(n = 0):
+  select_evt
+  | shutdown_evt (_ignore): void()
+  | listener_evt ([inp :: port.InputPort, outp :: port.OutputPort]):
+      thread.thread:
+        handle_client_connection(n, inp, outp)
+      run(n + 1)
+
+run()
