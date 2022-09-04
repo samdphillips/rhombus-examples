@@ -8,8 +8,8 @@
 */
 
 import:
-  // Don't forget rhombus/macro or annotations and stuff are harder to type
-  rhombus/macro open
+  // Don't forget rhombus/meta or annotations and stuff are harder to type
+  rhombus/meta open
   racket/base as r:
     rename:
       #{hash-ref}        as hash_ref
@@ -29,8 +29,8 @@ dot.macro 'goal_dot_provider $left $dot $right':
   | 'apply_empty': 'fun () -: Stream: $left.apply(empty_state)'
 
 annotation.macro 'Goal':
-  values(annotation_ct.pack_predicate('r.#{procedure?}',
-                                      '(($(dot_ct.provider_key), goal_dot_provider))'),
+  values(annotation_meta.pack_predicate('r.#{procedure?}',
+                                        '(($(statinfo_meta.dot_provider_key), goal_dot_provider))'),
          '')
 
 class Var (i :: Integer)
