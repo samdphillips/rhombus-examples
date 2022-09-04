@@ -26,8 +26,10 @@ jobs:
       run: raco pkg install --batch --auto ./rhombus-examples-kanren
     - name: install sheepdogs example
       run: raco pkg install --batch --auto ./rhombus-examples-sheepdogs
+    - name: install echo example
+      run: raco pkg install --batch --auto ./rhombus-examples-echo
     - name: check dependencies
-      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-web rhombus-examples-sheepdogs rhombus-examples-kanren
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-web rhombus-examples-sheepdogs rhombus-examples-kanren rhombus-examples-echo
   test_dynamic_dot_branch:
     runs-on: "ubuntu-latest"
     steps:
