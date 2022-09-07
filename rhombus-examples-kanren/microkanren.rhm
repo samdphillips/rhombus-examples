@@ -9,7 +9,10 @@
 
 import:
   // Don't forget rhombus/meta or annotations and stuff are harder to type
-  rhombus/meta open
+  rhombus/meta:
+    open
+    except:
+      bind
   racket/base as r:
     rename:
       #{hash-ref}        as hash_ref
