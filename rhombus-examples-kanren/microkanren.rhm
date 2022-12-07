@@ -31,15 +31,16 @@ dot.macro 'goal_dot_provider $left $dot $right':
   | 'apply':       'fun (state -: State) -: Stream: $left(state)'
   | 'apply_empty': 'fun () -: Stream: $left.apply(empty_state)'
 
-annotation.macro 'Goal':
-  values(annotation_meta.pack_predicate('r.#{procedure?}',
-                                        '(($(statinfo_meta.dot_provider_key), goal_dot_provider))'),
+annot.macro 'Goal':
+  values(annot_meta.pack_predicate('r.#{procedure?}',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      goal_dot_provider))'),
          '')
 
 class Var (i :: Integer)
 val is_var: #{Var?}
 
-annotation.macro 'Subst': values('Map.of(Var, Any)', '')
+annot.macro 'Subst': values('Map.of(Var, Any)', '')
 class State (counter :: Integer, subst :: Subst)
 
 val empty_state :: State: State(0, {})

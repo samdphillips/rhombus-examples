@@ -11,9 +11,9 @@ export:
   rename:
     r.#{current-thread} as current
 
-annotation.macro 'Thread':
-  values(annotation_meta.pack_predicate('r.#{thread?}',
-                                        '(($(statinfo_meta.dot_provider_key), thread_dot_provider))'),
+annot.macro 'Thread':
+  values(annot_meta.pack_predicate('r.#{thread?}',
+                                   '(($(statinfo_meta.dot_provider_key), thread_dot_provider))'),
          '')
 
 dot.macro 'thread_dot_provider $left $dot $right':

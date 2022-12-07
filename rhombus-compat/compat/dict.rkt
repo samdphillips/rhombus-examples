@@ -13,9 +13,10 @@ export:
   dict_dot_provider
   Dict
 
-annotation.macro 'Dict':
-  values(annotation_meta.pack_predicate('dict.is_dict',
-                                        '($(statinfo_meta.dot_provider_key), dict_dot_provider)'),
+annot.macro 'Dict':
+  values(annot_meta.pack_predicate('dict.is_dict',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      dict_dot_provider))'),
          '')
 
 dot.macro 'dict_dot_provider $left $dot $right':
