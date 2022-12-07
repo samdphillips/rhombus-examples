@@ -12,9 +12,10 @@ export:
   all_from(.stream)
   Stream
 
-annotation.macro 'Stream':
-  values(annotation_meta.pack_predicate('stream.#{stream?}',
-                                        '(($(statinfo_meta.dot_provider_key), stream_dot_provider))'),
+annot.macro 'Stream':
+  values(annot_meta.pack_predicate('stream.#{stream?}',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      stream_dot_provider))'),
          '')
 
 // XXX: if $left is annotated Stream.of(X) is there a way to access X and

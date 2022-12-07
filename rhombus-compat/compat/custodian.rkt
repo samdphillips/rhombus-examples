@@ -21,9 +21,10 @@ export:
   Custodian
   custodian_dot_provider
 
-annotation.macro 'Custodian':
-  values(annotation_meta.pack_predicate('r.#{custodian?}',
-                                        '(($(statinfo_meta.dot_provider_key), custodian_dot_provider))'),
+annot.macro 'Custodian':
+  values(annot_meta.pack_predicate('r.#{custodian?}',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      custodian_dot_provider))'),
          '')
 
 dot.macro 'custodian_dot_provider $left $dot $right':

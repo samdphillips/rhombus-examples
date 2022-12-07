@@ -23,20 +23,20 @@ fun close_port(p):
 
 fun is_port(p): r.#{input-port?}(p) || r.#{output-port?}(p)
 
-annotation.macro 'Port':
-  values(annotation_meta.pack_predicate('is_port',
-                                        '(($(statinfo_meta.dot_provider_key),
-                                           port_dot_provider))'),
+annot.macro 'Port':
+  values(annot_meta.pack_predicate('is_port',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      port_dot_provider))'),
          '')
 
 dot.macro 'port_dot_provider $left $dot $right':
   match right
   | 'close':         'fun (): close_port($left)'
 
-annotation.macro 'InputPort':
-  values(annotation_meta.pack_predicate('r.#{input-port?}',
-                                        '(($(statinfo_meta.dot_provider_key),
-                                           input_port_dot_provider))'),
+annot.macro 'InputPort':
+  values(annot_meta.pack_predicate('r.#{input-port?}',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      input_port_dot_provider))'),
          '')
 
 dot.macro 'input_port_dot_provider $left $dot $right':
@@ -47,9 +47,10 @@ dot.macro 'input_port_dot_provider $left $dot $right':
   | 'close':         'fun (): r.#{close-input-port}($left)'
   | 'close_evt':     'fun (): r.#{port-closed-evt}($left)'
 
-annotation.macro 'OutputPort':
-  values(annotation_meta.pack_predicate('r.#{output-port?}',
-                                        '(($(statinfo_meta.dot_provider_key), output_port_dot_provider))'),
+annot.macro 'OutputPort':
+  values(annot_meta.pack_predicate('r.#{output-port?}',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      output_port_dot_provider))'),
          '')
 
 dot.macro 'output_port_dot_provider $left $dot $right':

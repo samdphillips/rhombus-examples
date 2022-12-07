@@ -14,10 +14,10 @@ export:
   TcpListener
   tcp_listener_dot_provider
 
-annotation.macro 'TcpListener':
-  values(annotation_meta.pack_predicate('tcp.#{tcp-listener?}',
-                                        '(($(statinfo_meta.dot_provider_key),
-                                           tcp_listener_dot_provider))'),
+annot.macro 'TcpListener':
+  values(annot_meta.pack_predicate('tcp.#{tcp-listener?}',
+                                   '(($(statinfo_meta.dot_provider_key),
+                                      tcp_listener_dot_provider))'),
          '')
 
 dot.macro 'tcp_listener_dot_provider $left $dot $right':
