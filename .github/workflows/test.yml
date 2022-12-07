@@ -29,25 +29,3 @@ jobs:
       run: raco pkg install --batch --auto ./rhombus-examples-echo
     - name: check dependencies
       run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-web rhombus-examples-sheepdogs rhombus-examples-kanren rhombus-examples-echo
-  test_dynamic_dot_branch:
-    runs-on: "ubuntu-latest"
-    steps:
-    - name: checkout
-      uses: actions/checkout@master
-    - name: install racket
-      uses: Bogdanp/setup-racket@v1.8.1
-      with:
-        architecture: 'x64'
-        distribution: 'full'
-        variant: 'CS'
-        version: "current"
-    - name: install rhombus prototype (with dynamic-dot patches)
-      run: raco pkg install --batch --auto https://github.com/samdphillips/rhombus-prototype.git#dynamic-dot
-    - name: install Racket compat library
-      run: raco pkg install --batch --auto ./rhombus-compat
-    - name: install class interop example
-      run: raco pkg install --batch --auto ./rhombus-examples-class-interop
-    - name: check dependencies
-      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-class-interop
-    - name: simple interop test
-      run: racket -l- rhombus-examples/class/use.rhm
