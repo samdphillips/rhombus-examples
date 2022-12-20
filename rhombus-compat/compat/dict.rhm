@@ -2,7 +2,7 @@
 
 import:
   rhombus/meta open
-  racket/dict:
+  lib("racket/dict.rkt"):
     rename:
       #{dict-ref} as ref
       #{dict-set} as set

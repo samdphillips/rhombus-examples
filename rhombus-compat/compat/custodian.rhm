@@ -3,8 +3,8 @@
 import:
   rhombus/meta open
 
-  racket/base as r
-  racket/base as custodian:
+  lib("racket/base.rkt") as r
+  lib("racket/base.rkt") as custodian:
     rename:
       #{current-custodian}      as current
       #{custodian-shutdown-all} as shutdown

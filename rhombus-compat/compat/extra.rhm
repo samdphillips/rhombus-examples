@@ -1,7 +1,7 @@
 #lang rhombus
 
 
-import: racket/base as r
+import: lib("racket/base.rkt") as r
         rhombus/meta open
 
 export:

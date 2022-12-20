@@ -1,0 +1,7 @@
+#lang rhombus
+
+export: xml
+import:
+  lib("xml/main.rkt") as xml:
+    rename:
+      #{xexpr->string} as to_string

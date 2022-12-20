@@ -2,7 +2,7 @@
 
 import:
   rhombus/meta open
-  racket/tcp:
+  lib("racket/tcp.rkt"):
     rename:
       #{tcp-connect} as connect
       #{tcp-listen}  as listen
