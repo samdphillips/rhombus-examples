@@ -2,7 +2,7 @@
 
 import:
   rhombus/meta open
-  racket/base as r
+  lib("racket/base.rkt") as r
 
 export:
   Thread

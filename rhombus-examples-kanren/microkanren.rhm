@@ -13,7 +13,7 @@ import:
     open
     except:
       bind
-  racket/base as r:
+  lib("racket/base.rkt") as r:
     rename:
       #{hash-ref}        as hash_ref
       #{pair?}           as is_pair
@@ -38,17 +38,17 @@ annot.macro 'Goal':
          '')
 
 class Var (i :: Integer)
-val is_var: #{Var?}
+def is_var: #{Var?}
 
 annot.macro 'Subst': values('Map.of(Var, Any)', '')
 class State (counter :: Integer, subst :: Subst)
 
-val empty_state :: State: State(0, {})
+def empty_state :: State: State(0, {})
 
 
 // walk: finds the current value (if any) for a variable in the Subst
 fun walk(var, subst -: Subst) -: Any:
-  val value: r.hash_ref(subst, var, #false)
+  def value: r.hash_ref(subst, var, #false)
   cond
   | is_var(value): walk(value, subst)
   | r.not(value): var
@@ -57,14 +57,14 @@ fun walk(var, subst -: Subst) -: Any:
 
 // unify: attempts to unify two terms
 fun unify(u, v, subst -: Subst):
-  val u1: walk(u, subst)
-  val v1: walk(v, subst)
+  def u1: walk(u, subst)
+  def v1: walk(v, subst)
   cond
   | is_var(u1) && is_var(v1) && u1 === v1: subst
   | is_var(u1): subst ++ {u1: v1}
   | is_var(v1): subst ++ {v1: u1}
   | r.is_pair(u1) && r.is_pair(v1):
-      val s1: unify(r.car(u1), r.car(v1), subst)
+      def s1: unify(r.car(u1), r.car(v1), subst)
       s1 && unify(r.cdr(u1), r.cdr(v1), s1)
   | ~else:
       u1 === v1 && subst
@@ -73,7 +73,7 @@ fun unify(u, v, subst -: Subst):
 // unify_goal: construct a goal unifying two terms
 fun unify_goal(u, v) -: Goal:
   fun (state -: State) -: Stream:
-    val subst: unify(u, v, state.subst)
+    def subst: unify(u, v, state.subst)
     if subst
     | [State(state.counter, subst)]
     | []
@@ -89,12 +89,12 @@ operator (u ≡ v):
 // call_with_fresh_vars: allocate some fresh variables and pass them to
 // the procedure argument
 fun call_with_fresh_vars(proc) -: Goal:
-  val num_vars :: Integer: r.procedure_arity(proc)
+  def num_vars :: Integer: r.procedure_arity(proc)
   fun (state -: State) -: Stream:
     fun make_var(i):
       Var(state.counter + i)
-    val vars: r.build_list(num_vars, make_var)
-    val new_state: State(state.counter + num_vars, state.subst)
+    def vars: r.build_list(num_vars, make_var)
+    def new_state: State(state.counter + num_vars, state.subst)
     r.apply(proc, vars)(new_state)
 
 
@@ -163,7 +163,7 @@ expr.rule '($g0 ∧ $g1 ...):
 // --------- Examples -----------
 
 #//
-val g:
+def g:
   fresh (x, y):
     x ≡ symbol(red) ∧ y ≡ symbol(beans)
       ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
@@ -177,6 +177,6 @@ fun sixes(x :: Var) -: Goal:
   x ≡ 6 ∨ zzz(sixes(x))
 
 #//
-val fives_and_sixes -: Goal:
+def fives_and_sixes -: Goal:
   fresh (v):
     fives(v) ∨ sixes(v)

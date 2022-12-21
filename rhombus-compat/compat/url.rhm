@@ -1,7 +1,7 @@
 #lang rhombus
 
 import:
-  net/url:
+  lib("net/url.rkt"):
     rename:
       #{string->url}     as from_string
       #{url-path}        as path

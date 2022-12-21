@@ -6,20 +6,20 @@ import:
     only:
       when
     open
-  racket/base as r:
+  lib("racket/base.rkt") as r:
     rename:
       #{null?}          as is_null
       #{inexact->exact} as exact
       #{random-seed}    as random_seed
-  racket/list as l
+  lib("racket/list.rkt") as l
 
 class Posn(x,y)
 class Sheep(p :: Posn)
 class Sheepdog(p :: Posn)
 class World(width :: Integer, height :: Integer, entities)
 
-val sheep_view: 10
-val sheepdog_view: 25
+def sheep_view: 10
+def sheepdog_view: 25
 r.random_seed(0xDEC777)
 
 operator (a ^ b):
@@ -37,8 +37,8 @@ fun make_world(width :: Integer,
                height :: Integer,
                num_sheep :: Integer,
                num_sheepdogs :: Integer):: World:
-  val sheep: make_sheep(num_sheep, width, height)
-  val sheepdogs: make_sheepdogs(num_sheepdogs, width, height)
+  def sheep: make_sheep(num_sheep, width, height)
+  def sheepdogs: make_sheepdogs(num_sheepdogs, width, height)
   World(width, height, l.shuffle(r.append(sheep, sheepdogs)))
 
 // make_things :: make num_things width height -> Listof thing
@@ -47,8 +47,8 @@ fun make_things(make,
                 width :: Integer,
                 height :: Integer):
   fun make_random(i):
-    val w: r.random(0, width)
-    val h: r.random(0, height)
+    def w: r.random(0, width)
+    def h: r.random(0, height)
     make(Posn(w, h))
   // XXX: this begs the question: what does `for` syntax look like in Rhombus.
   // The shrubbery proposal has some possible `for` syntax.
@@ -66,7 +66,7 @@ fun make_sheepdogs(num_sheepdog :: Integer,
                    height       :: Integer):
   make_things(fun(p): Sheepdog(p), num_sheepdog, width, height)
 
-val d: [Posn(-1,-1), Posn(0, -1), Posn(1, -1),
+def d: [Posn(-1,-1), Posn(0, -1), Posn(1, -1),
         Posn(-1, 0), Posn(0,  0), Posn(1,  0),
         Posn(-1, 1), Posn(0,  1), Posn(1,  1)]
 
@@ -74,47 +74,47 @@ fun distance(width, height, Posn(x0, y0), Posn(x1, y1)):
   fun step(d, cur_distsq, cur_d):
     cond
     | r.is_null(d):
-        val dist: sqrt(cur_distsq)
+        def dist: sqrt(cur_distsq)
         values(dist,
                Posn (r.exact(round(cur_d.x / dist)),
                      r.exact(round(cur_d.y / dist))))
     | ~else:
-        val dx: (x1 + d[0].x * width) - x0
-        val dy: (y1 + d[0].y * height) - y0
-        val distsq: dx ^ 2 + dy ^ 2
+        def dx: (x1 + d[0].x * width) - x0
+        def dy: (y1 + d[0].y * height) - y0
+        def distsq: dx ^ 2 + dy ^ 2
         if r.not(cur_distsq) || distsq < cur_distsq
         | step(r.cdr(d), distsq, Posn(dx, dy))
         | step(r.cdr(d), cur_distsq, cur_d)
   step(d, #false, #false)
 
-val width: 100
-val height: 100
-val entity: Sheep(Posn(50, 50))
-val sight: match entity
+def width: 100
+def height: 100
+def entity: Sheep(Posn(50, 50))
+def sight: match entity
            | Sheep(_):    sheep_view
            | Sheepdog(_): sheepdog_view
-val posn: match entity
+def posn: match entity
           | Sheep(p): p
           | Sheepdog(p): p
-val scores: Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+def scores: Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
 fun update_score(d :: Posn, v :: Number):
-  val i: d.x + 1 + 3 * (d.y + 1)
+  def i: d.x + 1 + 3 * (d.y + 1)
   scores[i] := scores[i] + v
 
 fun calculate_scores(others):
   cond
   | r.is_null(others): scores
   | ~else:
-      val (dist :: Number, d :: Posn, score :: Integer):
+      def (dist :: Number, d :: Posn, score :: Integer):
         match r.car(others)
         | Sheep(p):
-            val (dist, d): distance(width, height, posn, p)
+            def (dist, d): distance(width, height, posn, p)
             values(dist, d, 1)
         | Sheepdog(p):
-            val (dist, d): distance(width, height, posn, p)
+            def (dist, d): distance(width, height, posn, p)
             values(dist, d, -1)
       when dist <= sight:
         update_score(d, score)
       calculate_scores(r.cdr(others))
 
-val the_world: make_world(100,100,100,100)
+def the_world: make_world(100,100,100,100)

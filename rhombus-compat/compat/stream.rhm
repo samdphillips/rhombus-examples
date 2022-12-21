@@ -2,7 +2,7 @@
 
 import:
   rhombus/meta open
-  racket/stream:
+  lib("racket/stream.rkt"):
     rename:
       #{stream-cons}  as cons
       #{stream-count} as count

@@ -2,7 +2,7 @@
 
 import:
   rhombus/meta open
-  racket/base:
+  lib("racket/base.rkt"):
     rename:
       #{eof-object?}  as is_eof
       #{choice-evt}   as choice_evt
@@ -26,13 +26,13 @@ expr.macro 'select_evt
             | ...':
   values('sync(handle_evt($evt_expr ..., fun ($evt_args, ...): $evt_handler), ...)', '')
 
-val shutdown_ch: make_channel()
-val shutdown_evt: guard_evt(fun (): shutdown_ch)
-val listener :: tcp.TcpListener: tcp.listen(12777)
-val listener_evt: listener.accept_evt()
+def shutdown_ch: make_channel()
+def shutdown_evt: guard_evt(fun (): shutdown_ch)
+def listener :: tcp.TcpListener: tcp.listen(12777)
+def listener_evt: listener.accept_evt()
 
 fun handle_client_connection(n, inp -: port.InputPort, outp -: port.OutputPort):
-  val close_evt: choice_evt(inp.close_evt(), outp.close_evt())
+  def close_evt: choice_evt(inp.close_evt(), outp.close_evt())
   fun echo():
     select_evt
     | close_evt (_ignore):

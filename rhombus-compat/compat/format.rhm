@@ -1,7 +1,7 @@
 #lang rhombus
 
 import:
-  racket/format:
+  lib("racket/format.rkt"):
     rename:
       #{~a} as a
       #{~r} as r

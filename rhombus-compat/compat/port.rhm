@@ -2,11 +2,11 @@
 
 import:
   rhombus/meta open
-  racket/base as r:
+  lib("racket/base.rkt") as r:
     rename:
       #{close-input-port}  as close_input_port
       #{close-output-port} as close_output_port
-  racket/port as p
+  lib("racket/port.rkt") as p
 
 export:
   port_dot_provider
