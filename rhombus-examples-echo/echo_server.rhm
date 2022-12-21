@@ -2,7 +2,7 @@
 
 import:
   rhombus/meta open
-  racket/base:
+  lib("racket/base.rkt"):
     rename:
       #{eof-object?}  as is_eof
       #{choice-evt}   as choice_evt
