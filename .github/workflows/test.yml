@@ -16,7 +16,7 @@ jobs:
         variant: 'CS'
         version: "current"
     - name: install rhombus prototype
-      run: raco pkg install --batch --auto rhombus-prototype
+      run: raco pkg install --batch --auto https://github.com/racket/rhombus-prototype.git
     - name: install Racket compat library
       run: raco pkg install --batch --auto ./rhombus-compat
     - name: install web example
