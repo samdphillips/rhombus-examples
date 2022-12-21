@@ -26,7 +26,7 @@ fun run(count, inp -: port.InputPort, outp -: port.OutputPort):
     run(count - 1, inp, outp)
 
 fun start(count = 10):
-  val values(inp :: port.InputPort, outp :: port.OutputPort): tcp.connect("localhost", 12777)
+  def values(inp :: port.InputPort, outp :: port.OutputPort): tcp.connect("localhost", 12777)
   dynamic_wind(
     void,
     thunk:
