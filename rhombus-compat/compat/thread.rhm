@@ -22,6 +22,6 @@ dot.macro 'thread_dot_provider $left $dot $right':
   | 'kill': 'fun (): r.#{kill-thread}($left)'
   | 'wait': 'fun (): r.#{thread-wait}($left)'
 
-expr.rule 'thread: $body':
+expr.macro 'thread: $body':
   'r.thread(fun (): $body)'
 

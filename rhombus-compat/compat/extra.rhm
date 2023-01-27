@@ -12,26 +12,26 @@ export:
   loop
   letcc
 
-expr.rule 'letcc $k: $body':
+expr.macro 'letcc $k: $body':
   'r.#{call/cc}(fun($k): $body)'
 
-expr.rule 'loop: $body ...; ...':
+expr.macro 'loop: $body ...; ...':
   'begin:
       fun lp():
         $body ...; ...
         lp()
       lp()'
 
-expr.rule 'thunk: $body':
+expr.macro 'thunk: $body':
   'fun (): $body'
 
 
-expr.rule 'when $test ... : $body':
+expr.macro 'when $test ... : $body':
   'if $test ...
    | $body
    | r.void()'
 
-expr.rule 'unless $test ... : $body':
+expr.macro 'unless $test ... : $body':
   'if $test ...
    | r.void()
    | $body'
