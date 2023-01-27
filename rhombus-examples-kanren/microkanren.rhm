@@ -32,15 +32,14 @@ dot.macro 'goal_dot_provider $left $dot $right':
   | 'apply_empty': 'fun () -: Stream: $left.apply(empty_state)'
 
 annot.macro 'Goal':
-  values(annot_meta.pack_predicate('r.#{procedure?}',
-                                   '(($(statinfo_meta.dot_provider_key),
-                                      goal_dot_provider))'),
-         '')
+  annot_meta.pack_predicate('r.#{procedure?}',
+                            '(($(statinfo_meta.dot_provider_key),
+                               goal_dot_provider))')
 
 class Var (i :: Integer)
 def is_var: #{Var?}
 
-annot.macro 'Subst': values('Map.of(Var, Any)', '')
+annot.macro 'Subst': 'Map.of(Var, Any)'
 class State (counter :: Integer, subst :: Subst)
 
 def empty_state :: State: State(0, {})
@@ -99,7 +98,7 @@ fun call_with_fresh_vars(proc) -: Goal:
 
 
 // sugar for `call_with_fresh_vars`
-expr.rule 'fresh ($u, $v, ...):
+expr.macro 'fresh ($u, $v, ...):
               $body ...
               ...':
   '(call_with_fresh_vars(fun ($u, $v, ...):
@@ -138,7 +137,7 @@ fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
 
 
 // zzz: snooze operator, delays creating a goal
-expr.rule 'zzz($g ...)':
+expr.macro 'zzz($g ...)':
   'fun (state -: State) -: Stream: stream.#{stream*}(($g ...)(state))'
 
 
@@ -152,10 +151,10 @@ operator ((g0 -: Goal) ∧ (g1 -: Goal)) -: Goal:
 
 
 /*
-expr.rule '($g0 ∨ $g1):
+expr.macro '($g0 ∨ $g1):
   '(disj($g0, zzz($g1)))
 
-expr.rule '($g0 ∧ $g1 ...):
+expr.macro '($g0 ∧ $g1 ...):
   ~stronger_than: ∨
   '(conj($g0, zzz($g1 ...)))
 */
