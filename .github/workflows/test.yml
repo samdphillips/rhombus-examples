@@ -1,4 +1,5 @@
 on:
+  push:
   pull_request:
   schedule:
   - cron: "17 */12 * * *"
