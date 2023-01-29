@@ -13,10 +13,9 @@ export:
   Stream
 
 annot.macro 'Stream':
-  values(annot_meta.pack_predicate('stream.#{stream?}',
-                                   '(($(statinfo_meta.dot_provider_key),
-                                      stream_dot_provider))'),
-         '')
+  annot_meta.pack_predicate('stream.#{stream?}',
+                            '(($(statinfo_meta.dot_provider_key),
+                               stream_dot_provider))')
 
 // XXX: if $left is annotated Stream.of(X) is there a way to access X and
 // push it into the RHS of the expansion cases?

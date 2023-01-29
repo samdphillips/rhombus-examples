@@ -24,7 +24,7 @@ expr.macro 'select_evt
             | $evt_expr ... ($evt_args, ...):
                 $evt_handler
             | ...':
-  values('sync(handle_evt($evt_expr ..., fun ($evt_args, ...): $evt_handler), ...)', '')
+  'sync(handle_evt($evt_expr ..., fun ($evt_args, ...): $evt_handler), ...)'
 
 def shutdown_ch: make_channel()
 def shutdown_evt: guard_evt(fun (): shutdown_ch)
