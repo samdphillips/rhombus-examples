@@ -3,7 +3,20 @@ on:
   schedule:
   - cron: "17 */12 * * *"
 jobs:
-  test:
+  test_compat:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+    - name: Install Rhombus prototype
+      uses: ./.github/actions/install-rhombus
+    - name: install Racket compat library
+      run: raco pkg install --batch --auto ./rhombus-compat
+    - name: check dependencies
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-compat
+
+  test_web:
+    needs: test_compat
     runs-on: "ubuntu-latest"
     steps:
     - name: checkout
@@ -14,11 +27,50 @@ jobs:
       run: raco pkg install --batch --auto ./rhombus-compat
     - name: install web example
       run: raco pkg install --batch --auto ./rhombus-examples-web
+    - name: check dependencies
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-web
+
+  test_kanren:
+    needs: test_compat
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+    - name: Install Rhombus prototype
+      uses: ./.github/actions/install-rhombus
+    - name: install Racket compat library
+      run: raco pkg install --batch --auto ./rhombus-compat
     - name: install kanren example
       run: raco pkg install --batch --auto ./rhombus-examples-kanren
+    - name: check dependencies
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-kanren
+
+  test_sheepdog:
+    needs: test_compat
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+    - name: Install Rhombus prototype
+      uses: ./.github/actions/install-rhombus
+    - name: install Racket compat library
+      run: raco pkg install --batch --auto ./rhombus-compat
     - name: install sheepdogs example
       run: raco pkg install --batch --auto ./rhombus-examples-sheepdogs
+    - name: check dependencies
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-sheepdogs
+
+  test_echo:
+    needs: test_compat
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+    - name: Install Rhombus prototype
+      uses: ./.github/actions/install-rhombus
+    - name: install Racket compat library
+      run: raco pkg install --batch --auto ./rhombus-compat
     - name: install echo example
       run: raco pkg install --batch --auto ./rhombus-examples-echo
     - name: check dependencies
-      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-web rhombus-examples-sheepdogs rhombus-examples-kanren rhombus-examples-echo
+      run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-echo
