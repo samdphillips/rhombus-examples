@@ -1,0 +1,14 @@
+name: "Install Rhombus prototype"
+runs:
+  using: "composite"
+  steps:
+  - name: install racket
+    uses: Bogdanp/setup-racket@v1.9
+    with:
+      architecture: 'x64'
+      distribution: 'full'
+      variant: 'CS'
+      version: "current"
+  - name: install rhombus prototype
+    run: raco pkg install --batch --auto https://github.com/racket/rhombus-prototype.git
+    shell: bash
