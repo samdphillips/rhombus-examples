@@ -24,7 +24,7 @@ runs:
       dest: "/opt/racket"
   - name: install rhombus prototype
     if: steps.cache.outputs.cache-hit != 'true'
-    run: sudo raco pkg install -i --batch --auto https://github.com/racket/rhombus-prototype.git
+    run: sudo /opt/racket/bin/raco pkg install -i --batch --auto https://github.com/racket/rhombus-prototype.git
     shell: bash
   - name: update PATH
     if: steps.cache.outputs.cache-hit == 'true'
