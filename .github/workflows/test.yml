@@ -10,6 +10,9 @@ jobs:
       uses: actions/checkout@master
     - name: Install Rhombus prototype
       uses: ./.github/actions/install-rhombus
+    - name: debug pwd
+      run: pwd
+      shell: bash
     - name: install Racket compat library
       run: raco pkg install --batch --auto ./rhombus-compat
     - name: check dependencies
