@@ -12,9 +12,7 @@ runs:
     with:
       key: ${{ steps.get-date.outputs.date }}
       path: |
-        ~/.cache/racket
-        ~/.local/share/racket
-        /opt/racket        
+        /opt/racket
   - name: install racket
     if: steps.cache.outputs.cache-hit != 'true'
     uses: Bogdanp/setup-racket@v1.9.1
@@ -26,7 +24,7 @@ runs:
       dest: "/opt/racket"
   - name: install rhombus prototype
     if: steps.cache.outputs.cache-hit != 'true'
-    run: raco pkg install --batch --auto https://github.com/racket/rhombus-prototype.git
+    run: raco pkg install -i --batch --auto https://github.com/racket/rhombus-prototype.git
     shell: bash
   - name: update PATH
     if: steps.cache.outputs.cache-hit == 'true'
