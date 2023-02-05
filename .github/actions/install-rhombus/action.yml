@@ -28,3 +28,7 @@ runs:
     if: steps.cache.outputs.cache-hit != 'true'
     run: raco pkg install --batch --auto https://github.com/racket/rhombus-prototype.git
     shell: bash
+  - name: update PATH
+    if: steps.cache.outputs.cache-hit == 'true'
+    run: echo "PATH=/opt/racket/bin:$PATH" >> $GITHUB_ENV
+    shell: bash
