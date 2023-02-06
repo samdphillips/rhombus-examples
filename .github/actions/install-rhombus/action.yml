@@ -1,0 +1,32 @@
+name: "Install Rhombus prototype"
+runs:
+  using: "composite"
+  steps:
+  - name: Current Date
+    id: get-date
+    run: echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+    shell: bash
+  - name: Cache base install
+    id: cache
+    uses: actions/cache@v3.2.4
+    with:
+      key: ${{ steps.get-date.outputs.date }}
+      path: |
+        /opt/racket
+  - name: install racket
+    if: steps.cache.outputs.cache-hit != 'true'
+    uses: Bogdanp/setup-racket@v1.9.1
+    with:
+      architecture: 'x64'
+      distribution: 'full'
+      variant: 'CS'
+      version: "current"
+      dest: "/opt/racket"
+  - name: install rhombus prototype
+    if: steps.cache.outputs.cache-hit != 'true'
+    run: sudo /opt/racket/bin/raco pkg install -i --batch --auto https://github.com/racket/rhombus-prototype.git
+    shell: bash
+  - name: update PATH
+    if: steps.cache.outputs.cache-hit == 'true'
+    run: echo "PATH=/opt/racket/bin:$PATH" >> $GITHUB_ENV
+    shell: bash
