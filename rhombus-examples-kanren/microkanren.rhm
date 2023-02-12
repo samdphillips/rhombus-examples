@@ -28,8 +28,8 @@ import:
 // there isn't an arrow annotation.
 dot.macro 'goal_dot_provider $left $dot $right':
   match right
-  | 'apply':       'fun (state -: State) -: Stream: $left(state)'
-  | 'apply_empty': 'fun () -: Stream: $left.apply(empty_state)'
+  | 'apply':       'fun (state :~ State) :~ Stream: $left(state)'
+  | 'apply_empty': 'fun () :~ Stream: $left.apply(empty_state)'
 
 annot.macro 'Goal':
   annot_meta.pack_predicate('r.#{procedure?}',
@@ -46,7 +46,7 @@ def empty_state :: State: State(0, {})
 
 
 // walk: finds the current value (if any) for a variable in the Subst
-fun walk(var, subst -: Subst) -: Any:
+fun walk(var, subst :~ Subst) :~ Any:
   def value: r.hash_ref(subst, var, #false)
   cond
   | is_var(value): walk(value, subst)
@@ -55,7 +55,7 @@ fun walk(var, subst -: Subst) -: Any:
 
 
 // unify: attempts to unify two terms
-fun unify(u, v, subst -: Subst):
+fun unify(u, v, subst :~ Subst):
   def u1: walk(u, subst)
   def v1: walk(v, subst)
   cond
@@ -70,8 +70,8 @@ fun unify(u, v, subst -: Subst):
 
 
 // unify_goal: construct a goal unifying two terms
-fun unify_goal(u, v) -: Goal:
-  fun (state -: State) -: Stream:
+fun unify_goal(u, v) :~ Goal:
+  fun (state :~ State) :~ Stream:
     def subst: unify(u, v, state.subst)
     if subst
     | [State(state.counter, subst)]
@@ -87,9 +87,9 @@ operator (u ≡ v):
 
 // call_with_fresh_vars: allocate some fresh variables and pass them to
 // the procedure argument
-fun call_with_fresh_vars(proc) -: Goal:
+fun call_with_fresh_vars(proc) :~ Goal:
   def num_vars :: Integer: r.procedure_arity(proc)
-  fun (state -: State) -: Stream:
+  fun (state :~ State) :~ Stream:
     fun make_var(i):
       Var(state.counter + i)
     def vars: r.build_list(num_vars, make_var)
@@ -103,13 +103,13 @@ expr.macro 'fresh ($u, $v, ...):
               ...':
   '(call_with_fresh_vars(fun ($u, $v, ...):
                            $body ...
-                           ...)) -: Goal'
+                           ...)) :~ Goal'
 
 
 // mplus: Monadic plus for the Stream of answers.  Similar to the paper this
 // implementation alternates the two input streams allowing for breadth first
 // search.
-fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
+fun mplus(st0 :~ Stream, st1 :~ Stream) :~ Stream:
   cond
   | st0.is_empty: st1
   | ~else:
@@ -117,7 +117,7 @@ fun mplus(st0 -: Stream, st1 -: Stream) -: Stream:
 
 
 // bind: Monadic bind for the Stream of answers.
-fun bind(st -: Stream, goal -: Goal) -: Stream:
+fun bind(st :~ Stream, goal :~ Goal) :~ Stream:
   cond
   | st.is_empty: []
   | ~else:
@@ -125,27 +125,27 @@ fun bind(st -: Stream, goal -: Goal) -: Stream:
 
 
 // disj: construct a disjunction goal from two goals
-fun disj(g0 -: Goal, g1 -: Goal) -: Goal:
-  fun (state -: State) -: Stream:
+fun disj(g0 :~ Goal, g1 :~ Goal) :~ Goal:
+  fun (state :~ State) :~ Stream:
     mplus(g0(state), g1(state))
 
 
 // conj: construct a conjunction goal from two goals
-fun conj(g0 -: Goal, g1 -: Goal) -: Goal:
-  fun (state -: State) -: Stream:
+fun conj(g0 :~ Goal, g1 :~ Goal) :~ Goal:
+  fun (state :~ State) :~ Stream:
     bind(g0(state), g1)
 
 
 // zzz: snooze operator, delays creating a goal
 expr.macro 'zzz($g ...)':
-  'fun (state -: State) -: Stream: stream.#{stream*}(($g ...)(state))'
+  'fun (state :~ State) :~ Stream: stream.#{stream*}(($g ...)(state))'
 
 
-operator ((g0 -: Goal) ∨ (g1 -: Goal)) -: Goal:
+operator ((g0 :~ Goal) ∨ (g1 :~ Goal)) :~ Goal:
   disj(g0, g1)
 
 
-operator ((g0 -: Goal) ∧ (g1 -: Goal)) -: Goal:
+operator ((g0 :~ Goal) ∧ (g1 :~ Goal)) :~ Goal:
   ~stronger_than: ∨
   conj(g0, g1)
 
@@ -168,14 +168,14 @@ def g:
       ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
 
 #//
-fun fives(x :: Var) -: Goal:
+fun fives(x :: Var) :~ Goal:
   x ≡ 5 ∨ zzz(fives(x))
 
 #//
-fun sixes(x :: Var) -: Goal:
+fun sixes(x :: Var) :~ Goal:
   x ≡ 6 ∨ zzz(sixes(x))
 
 #//
-def fives_and_sixes -: Goal:
+def fives_and_sixes :~ Goal:
   fresh (v):
     fives(v) ∨ sixes(v)
