@@ -9,13 +9,12 @@ import:
   rhombus/compat/extra:
     expose:
       thunk
-      unless
   rhombus/compat/port
   rhombus/compat/tcp
 
 fun run(count, inp :~ port.InputPort, outp :~ port.OutputPort):
-  unless (count == 0):
-    outp.displayln("ping " +& count)
+  unless (count == 0)
+  | outp.displayln("ping " +& count)
     outp.flush()
     displayln("sent: " +& count)
     displayln("received: " +& inp.readline())
