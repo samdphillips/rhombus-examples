@@ -2,10 +2,6 @@
 
 import:
   rhombus/meta open
-  rhombus/compat/extra:
-    only:
-      when
-    open
   lib("racket/base.rkt") as r:
     rename:
       #{null?}          as is_null
@@ -113,8 +109,8 @@ fun calculate_scores(others):
         | Sheepdog(p):
             def (dist, d): distance(width, height, posn, p)
             values(dist, d, -1)
-      when dist <= sight:
-        update_score(d, score)
+      when dist <= sight
+      | update_score(d, score)
       calculate_scores(r.cdr(others))
 
 def the_world: make_world(100,100,100,100)
