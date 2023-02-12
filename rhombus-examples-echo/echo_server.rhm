@@ -31,7 +31,7 @@ def shutdown_evt: guard_evt(fun (): shutdown_ch)
 def listener :: tcp.TcpListener: tcp.listen(12777)
 def listener_evt: listener.accept_evt()
 
-fun handle_client_connection(n, inp -: port.InputPort, outp -: port.OutputPort):
+fun handle_client_connection(n, inp :~ port.InputPort, outp :~ port.OutputPort):
   def close_evt: choice_evt(inp.close_evt(), outp.close_evt())
   fun echo():
     select_evt

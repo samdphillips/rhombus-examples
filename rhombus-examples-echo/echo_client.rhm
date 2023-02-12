@@ -16,7 +16,7 @@ import:
   rhombus/compat/port
   rhombus/compat/tcp
 
-fun run(count, inp -: port.InputPort, outp -: port.OutputPort):
+fun run(count, inp :~ port.InputPort, outp :~ port.OutputPort):
   unless (count == 0):
     outp.displayln("ping " +& count)
     outp.flush()
