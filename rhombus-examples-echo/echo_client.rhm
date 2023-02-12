@@ -2,10 +2,7 @@
 
 import:
   lib("racket/base.rkt"):
-    rename:
-      #{dynamic-wind} as dynamic_wind
     expose:
-      dynamic_wind
       random
       sleep
       void
@@ -26,13 +23,12 @@ fun run(count, inp :~ port.InputPort, outp :~ port.OutputPort):
     run(count - 1, inp, outp)
 
 fun start(count = 10):
-  def values(inp :: port.InputPort, outp :: port.OutputPort): tcp.connect("localhost", 12777)
-  dynamic_wind(
-    void,
-    thunk:
-      run(count, inp, outp),
-    thunk:
-      inp.close()
-      outp.close())
+  def values(inp :: port.InputPort, outp :: port.OutputPort):
+      tcp.connect("localhost", 12777)
+  try:
+      run(count, inp, outp)
+      ~finally:
+          inp.close()
+          outp.close()
 
 start()
