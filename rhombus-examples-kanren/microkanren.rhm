@@ -164,8 +164,8 @@ expr.macro '($g0 ∧ $g1 ...):
 #//
 def g:
   fresh (x, y):
-    x ≡ symbol(red) ∧ y ≡ symbol(beans)
-      ∨ x ≡ symbol(split) ∧ y ≡ symbol(pea)
+    x ≡ #'red ∧ y ≡ #'beans
+      ∨ x ≡ #'split ∧ y ≡ #'pea
 
 #//
 fun fives(x :: Var) :~ Goal:
