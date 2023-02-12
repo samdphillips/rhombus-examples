@@ -39,14 +39,12 @@ def http_request:
       def max_tries: 10
       def pos_args: rkt.list(http.current_session(), uri)
       fun request_retry(tries_left):
-        def should_retry:
-          if tries_left == 0
-          | fun(exn): #false
-          | rkt.is_exn_fail
-        rkt.proc_with_handlers(
-          should_retry,
-          fun(e): request_retry(tries_left - 1),
-          fun(): rkt.keyword_apply(http.session_request, kws, kwargs, pos_args))
+        try:
+          rkt.keyword_apply(http.session_request, kws, kwargs, pos_args)
+          ~catch e :: Exn.Fail:
+            if tries_left == 0
+            | throw e
+            | request_retry(tries_left - 1)
       d.disposable(
         fun(): request_retry(max_tries),
         http.response_close))
