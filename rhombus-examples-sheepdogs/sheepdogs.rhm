@@ -12,7 +12,7 @@ import:
 class Posn(x,y)
 class Sheep(p :: Posn)
 class Sheepdog(p :: Posn)
-class World(width :: Integer, height :: Integer, entities)
+class World(width :: Int, height :: Int, entities)
 
 def sheep_view: 10
 def sheepdog_view: 25
@@ -29,19 +29,19 @@ operator (a % b):
   r.modulo(a, b)
 
 // make_world :: width height num_sheep num_sheepdogs -> World
-fun make_world(width :: Integer,
-               height :: Integer,
-               num_sheep :: Integer,
-               num_sheepdogs :: Integer):: World:
+fun make_world(width :: Int,
+               height :: Int,
+               num_sheep :: Int,
+               num_sheepdogs :: Int):: World:
   def sheep: make_sheep(num_sheep, width, height)
   def sheepdogs: make_sheepdogs(num_sheepdogs, width, height)
   World(width, height, l.shuffle(r.append(sheep, sheepdogs)))
 
 // make_things :: make num_things width height -> Listof thing
 fun make_things(make,
-                num_things :: Integer,
-                width :: Integer,
-                height :: Integer):
+                num_things :: Int,
+                width :: Int,
+                height :: Int):
   fun make_random(i):
     def w: r.random(0, width)
     def h: r.random(0, height)
@@ -51,15 +51,15 @@ fun make_things(make,
   r.map(make_random, l.range(num_things))
 
 // make_sheep :: num_sheep width height -> Listof Sheep
-fun make_sheep(num_sheep :: Integer,
-               width     :: Integer,
-               height    :: Integer):
+fun make_sheep(num_sheep :: Int,
+               width     :: Int,
+               height    :: Int):
   make_things(fun(p): Sheep(p), num_sheep, width, height)
 
 // make_sheepdogs :: num_sheepdogs width height -> Listof Sheepdog
-fun make_sheepdogs(num_sheepdog :: Integer,
-                   width        :: Integer,
-                   height       :: Integer):
+fun make_sheepdogs(num_sheepdog :: Int,
+                   width        :: Int,
+                   height       :: Int):
   make_things(fun(p): Sheepdog(p), num_sheepdog, width, height)
 
 def d: [Posn(-1,-1), Posn(0, -1), Posn(1, -1),
@@ -101,7 +101,7 @@ fun calculate_scores(others):
   cond
   | r.is_null(others): scores
   | ~else:
-      def (dist :: Number, d :: Posn, score :: Integer):
+      def (dist :: Number, d :: Posn, score :: Int):
         match r.car(others)
         | Sheep(p):
             def (dist, d): distance(width, height, posn, p)
