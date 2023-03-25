@@ -36,11 +36,11 @@ annot.macro 'Goal':
                             '(($(statinfo_meta.dot_provider_key),
                                goal_dot_provider))')
 
-class Var (i :: Integer)
+class Var (i :: Int)
 def is_var: #{Var?}
 
 annot.macro 'Subst': 'Map.of(Var, Any)'
-class State (counter :: Integer, subst :: Subst)
+class State (counter :: Int, subst :: Subst)
 
 def empty_state :: State: State(0, {})
 
@@ -88,7 +88,7 @@ operator (u ≡ v):
 // call_with_fresh_vars: allocate some fresh variables and pass them to
 // the procedure argument
 fun call_with_fresh_vars(proc) :~ Goal:
-  def num_vars :: Integer: r.procedure_arity(proc)
+  def num_vars :: Int: r.procedure_arity(proc)
   fun (state :~ State) :~ Stream:
     fun make_var(i):
       Var(state.counter + i)
