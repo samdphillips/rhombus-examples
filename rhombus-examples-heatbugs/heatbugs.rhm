@@ -1,0 +1,189 @@
+#lang rhombus/static
+
+import:
+  lib("racket/base.rkt"):
+    only sort
+    expose sort
+  lib("racket/list.rkt"):
+    only shuffle
+    expose shuffle
+
+def world_width = 5
+def world_height = 5
+
+def min_target_temp = 10
+def max_target_temp = 20
+
+def min_emit_temp = 5
+def max_emit_temp = 10
+
+def diffuse_amount = 0.2
+
+fun random_range(lo :: Real, hi :: Real) :~ Real:
+  math.random() * (hi - lo) + lo
+
+class ArrayView(arr :: Array, x_off :: Int, y_off :: Int):
+  method at(i :: NonnegInt):
+    let x = i rem world_width
+    let y = i div world_width
+    let x1 = (x + this.x_off) mod world_width
+    let y1 = (y + this.y_off) mod world_height
+    let j = x1 + y1 * world_width
+    this.arr[j]
+
+class Posn(x, y):
+  export random
+  fun random():
+    Posn(math.random(world_width),
+         math.random(world_height))
+
+  property index :: NonnegInt:
+    (this.y * world_width) + this.x
+
+  method neighbors() :: List.of(Posn):
+    for List:
+      each i: -1..2
+      each j: -1..2
+      //skip_when i == 0 && j == 0
+      Posn((x + i) mod world_width, (y + j) mod world_height)
+
+class Heatbug(~posn: mutable posn :: Posn,
+              ~target_temp: target_temp :: Real,
+              ~emit_temp: emit_temp :: Real):  
+  constructor
+  | ():
+      super(~posn: Posn.random(),
+            ~target_temp: random_range(min_target_temp, max_target_temp),
+            ~emit_temp: random_range(min_emit_temp, max_emit_temp))
+  | (~posn, ~target_temp, ~emit_temp):
+      super(~posn: posn, ~target_temp: target_temp, ~emit_temp: emit_temp)
+
+  property index :: NonnegInt:
+    this.posn.index
+
+  method current_happiness():
+    this.happiness(this.posn)
+
+  method happiness(cell_temp):
+    math.abs(cell_temp - this.target_temp)
+
+  method best_moves(env :: Environment):
+    let neighbors = shuffle(this.posn.neighbors())
+    sort(neighbors,
+         fun(a,b): a<b,
+         ~key: fun(posn): this.happiness(env.temp_at(posn)))
+
+  method move(env :: Environment):
+    let moves :~ List.of(Posn) = this.best_moves(env)
+    for:
+      each p: moves
+      keep_when env.is_cell_empty(p)
+      final_when env.is_cell_empty(p)
+      env.bug_cells[this.index] := #false
+      env.bug_cells[p.index] := this
+      this.posn := p
+
+  method emit_heat(env :: Environment):
+    env.adjust_heat(this.posn, this.emit_temp)
+  
+
+class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
+                  ~temp_cells: temp_cells :: Array.of(Real)):
+  implements: Printable
+              
+  constructor (~num_bugs: num_bugs :: NonnegInt,
+               ~initial_temp: initial_temp :: Real):
+    let bug_cells = Array.make(world_width * world_height, #false)
+    place_bugs(bug_cells, num_bugs)
+    super(~bug_cells: bug_cells,
+          ~temp_cells: Array.make(world_width * world_height, initial_temp))
+
+  override print(outp):
+    import rhombus
+    rhombus.display("Environment(num_bugs: ", outp)
+    rhombus.print(this.count_bugs(), outp)
+    rhombus.display(", average_temp: ", outp)
+    rhombus.print(this.average_temp(), outp)
+    rhombus.display(")", outp)
+
+  fun place_bugs(bug_cells :: Array, num_bugs :: NonnegInt):    
+    unless num_bugs == 0
+    | let bug = Heatbug()
+      cond
+      | bug_cells[bug.index]: place_bugs(bug_cells, num_bugs)
+      | ~else:
+          bug_cells[bug.index] := bug
+          place_bugs(bug_cells, num_bugs - 1)
+
+  method count_bugs() :: NonnegInt:
+    for values(count = 0):
+      each cell: this.bug_cells
+      keep_when cell
+      count + 1      
+
+  method average_temp() :: Real:
+    let total_temp = for values(sum = 0):
+                       each temp: this.temp_cells
+                       sum + temp
+    total_temp / (world_width * world_height)
+
+  method is_cell_empty(posn :: Posn) :: Boolean:
+    !this.bug_cells[posn.index]
+
+  method temp_at(posn :: Posn) :: Real:
+    this.temp_cells[posn.index]
+
+  method adjust_heat(posn :: Posn, d_temp :: Real):
+    this.temp_cells[posn.index] := this.temp_cells[posn.index] + d_temp
+
+  method bugs() :: List.of(Heatbug):
+    for List:
+      each cell: bug_cells
+      keep_when cell
+      cell
+
+  method diffuse_heat():
+    let d_heat = \
+      for List:
+        each h: temp_cells
+        h * diffuse_amount
+    let d_heat1 = Array.make(d_heat.length())
+    for:
+      each:
+        i: 0..
+        h: d_heat
+      d_heat1[i] := h / 8
+
+    let dirs :: List.of(ArrayView) = \
+      for List:
+        each x: -1..2
+        each y: -1..2
+        skip_when x == 0 && y == 0
+        ArrayView(d_heat1, x, y)
+
+    for:
+      each:
+        h: temp_cells
+        Δ: d_heat
+        i: 0..
+      let Δn = \
+        for values(sum = 0):
+          each d: dirs
+          sum + d.at(i)
+      temp_cells[i] := h - Δ + Δn
+
+  method step():
+    let bugs :~ List.of(Heatbug) = shuffle(this.bugs())
+    for:
+      each bug: bugs
+      bug.emit_heat(this)
+    for:
+      each bug: bugs
+      bug.move(this)
+    this.diffuse_heat()
+    this
+
+def e = Environment(~num_bugs: 5, ~initial_temp: 5.0)
+for:
+  each i: 0..100
+  displayln(i +& " " +& e.step())
