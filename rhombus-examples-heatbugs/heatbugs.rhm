@@ -1,12 +1,8 @@
 #lang rhombus/static
 
 import:
-  lib("racket/base.rkt"):
-    only sort
-    expose sort
-  lib("racket/list.rkt"):
-    only shuffle
-    expose shuffle
+  lib("racket/base.rkt").sort
+  lib("racket/list.rkt").shuffle
 
 def world_width = 5
 def world_height = 5
@@ -143,7 +139,7 @@ class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
       cell
 
   method diffuse_heat():
-    let d_heat = \
+    let d_heat:
       for List:
         each h: temp_cells
         h * diffuse_amount
@@ -154,7 +150,7 @@ class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
         h: d_heat
       d_heat1[i] := h / 8
 
-    let dirs :: List.of(ArrayView) = \
+    let dirs :: List.of(ArrayView):
       for List:
         each x: -1..2
         each y: -1..2
@@ -166,7 +162,7 @@ class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
         h: temp_cells
         Δ: d_heat
         i: 0..
-      let Δn = \
+      let Δn:
         for values(sum = 0):
           each d: dirs
           sum + d.at(i)
