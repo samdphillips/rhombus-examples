@@ -1,0 +1,70 @@
+#lang rhombus/static
+
+import:
+  "heatbugs.rhm"
+  rhombus/gui
+  rhombus/draw
+
+def bugs = heatbugs.Environment(~num_bugs: 20,
+                                ~initial_temp: 5.0)
+
+def obs = gui.Obs(bugs)
+
+def cell_size = 25
+
+fun lerp(x0 :: Real, x1 :: Real, y0 :: Real, y1 :: Real):
+  def m = (y1 - y0) / (x1 - x0)
+  def b = y0 - m * x0
+  fun(v :: Real):
+    cond
+    | v <= x0: y0
+    | x1 <= v: y1
+    | ~else: m * v + b
+
+fun lerp_color(v0 :: Real,
+               v1 :: Real,
+               c0 :: draw.Color,
+               c1 :: draw.Color):
+  fun floor(f):
+    fun(v):
+      math.exact(math.floor(f(v)))
+  def rl = floor(lerp(v0, v1, c0.red, c1.red))
+  def gl = floor(lerp(v0, v1, c0.green, c1.green))
+  def bl = floor(lerp(v0, v1, c0.blue, c1.blue))
+  fun(v):
+    draw.Color(rl(v), gl(v), bl(v))
+
+def patch_color:
+  lerp_color(0, heatbugs.max_target_temp, draw.Color("blue"), draw.Color("red"))
+
+def bug_color:
+  lerp_color(0, 10, draw.Color("green"), draw.Color("red"))
+
+fun draw_heatbugs(dc :: draw.DC, bugs :: heatbugs.Environment):
+  dc.pen := draw.Pen(~style: #'transparent)
+  for:
+    each i: 0..heatbugs.world_width
+    each j: 0..heatbugs.world_height
+    def pos = heatbugs.Posn(i, j)
+
+    dc.brush := draw.Brush(~color: patch_color(bugs.temp_at(pos)))
+    dc.rectangle(i * cell_size, j * cell_size, cell_size, cell_size)
+
+    unless bugs.is_cell_empty(pos)
+    | def cur_bug :: heatbugs.Heatbug = bugs.bug_at(pos)
+      dc.brush := draw.Brush(~color: bug_color(cur_bug.current_happiness(bugs)))
+      dc.ellipse(i * cell_size + cell_size/4, j * cell_size + cell_size/4,
+                 cell_size / 2, cell_size / 2)
+
+gui.render(gui.Window(~title: "Heatbugs",
+                      gui.Canvas(obs,
+                                 draw_heatbugs,
+                                 ~min_size: [cell_size * heatbugs.world_width,
+                                             cell_size * heatbugs.world_height]),
+                      gui.Button("Step",
+                                 ~action:
+                                   fun ():
+                                     obs.update(fun (bugs :: heatbugs.Environment):
+                                                  for values(bugs = bugs):
+                                                    each i: 0..1
+                                                    (bugs :: heatbugs.Environment).step()))))

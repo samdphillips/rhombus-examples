@@ -4,16 +4,25 @@ import:
   lib("racket/base.rkt").sort
   lib("racket/list.rkt").shuffle
 
-def world_width = 5
-def world_height = 5
+export:
+  max_target_temp
+  world_width
+  world_height
+  Posn
+  Heatbug
+  Environment
+
+def world_width  = 20
+def world_height = 20
 
 def min_target_temp = 10
 def max_target_temp = 20
 
-def min_emit_temp = 5
-def max_emit_temp = 10
+def min_emit_temp = 0.5
+def max_emit_temp = 2.0
 
 def diffuse_amount = 0.2
+def evaporate_amount = 0.01
 
 fun random_range(lo :: Real, hi :: Real) :~ Real:
   math.random() * (hi - lo) + lo
@@ -57,8 +66,9 @@ class Heatbug(~posn: mutable posn :: Posn,
   property index :: NonnegInt:
     this.posn.index
 
-  method current_happiness():
-    this.happiness(this.posn)
+  method current_happiness(env :: Environment):
+    def t = env.temp_at(this.posn)
+    this.happiness(t)
 
   method happiness(cell_temp):
     math.abs(cell_temp - this.target_temp)
@@ -129,6 +139,9 @@ class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
   method temp_at(posn :: Posn) :: Real:
     this.temp_cells[posn.index]
 
+  method bug_at(posn :: Posn) :: Heatbug:
+    this.bug_cells[posn.index]
+
   method adjust_heat(posn :: Posn, d_temp :: Real):
     this.temp_cells[posn.index] := this.temp_cells[posn.index] + d_temp
 
@@ -166,7 +179,7 @@ class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
         for values(sum = 0):
           each d: dirs
           sum + d.at(i)
-      temp_cells[i] := h - Δ + Δn
+      temp_cells[i] := h - h * evaporate_amount - Δ + Δn
 
   method step():
     let bugs :~ List.of(Heatbug) = shuffle(this.bugs())
@@ -179,7 +192,3 @@ class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
     this.diffuse_heat()
     this
 
-def e = Environment(~num_bugs: 5, ~initial_temp: 5.0)
-for:
-  each i: 0..100
-  displayln(i +& " " +& e.step())
