@@ -1,0 +1,60 @@
+#lang rhombus
+
+import:
+  "stream.rhm": open
+
+submodule test:
+  check [1,2,3] ~is_a Stream
+
+  check:
+    use_static
+    let v :: Stream = [1, 2, 3]
+    v.first
+    ~is 1
+
+  check:
+    use_static
+    let v :: Stream.of(Int) = [1, 2, 3]
+    v.first
+    ~is 1
+
+  check:
+    use_static
+    Stream.empty.is_empty
+    ~is #true
+
+  check:
+    use_static
+    let v :: Stream.of(String) = ["abc"]
+    v.first.length()
+    ~is 3
+
+  check:
+    use_static
+    let v :: Stream.of(String) = ["abc"]
+    Stream.first(v).length()
+    ~is 3
+
+  check:
+    use_static
+    let v :: Stream.of(String) = ["abc", "defg"]
+    v.rest
+    ~is ["defg"]
+
+  check:
+    use_static
+    let v :: Stream.of(String) = ["abc", "defg"]
+    v.rest.first.length()
+    ~is 4
+
+  check:
+    use_static
+    let v :: Stream.of(String) = ["abc", "defg"]
+    v.take(1).first
+    ~is "abc"
+
+  check:
+    use_static
+    let v :: Stream.of(String) = ["abc", "defg"]
+    v.take(1).rest
+    ~is_a Stream.empty
