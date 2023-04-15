@@ -1,30 +1,87 @@
-#lang rhombus
+#lang rhombus/static/and_meta
 
 import:
-  rhombus/meta open
-  lib("racket/stream.rkt"):
-    rename:
-      #{stream-cons}  as cons
-      #{stream-count} as count
-      #{empty-stream} as empty
+  lib("racket/stream.rkt")
 
 export:
-  all_from(.stream)
   Stream
 
-annot.macro 'Stream':
-  annot_meta.pack_predicate('stream.#{stream?}',
-                            '(($(statinfo_meta.dot_provider_key),
-                               stream_dot_provider))')
+meta:
+  namespace stream_meta:
+    export infos_key make_statinfo
+    def infos_key = '#%stream_of_info'
 
-// XXX: if $left is annotated Stream.of(X) is there a way to access X and
-// push it into the RHS of the expansion cases?
+    fun make_statinfo(of_info = '()' :: Syntax):
+      '(($(statinfo_meta.dot_provider_key), stream_dot_provider),
+        ($(infos_key), $of_info))'
+
+namespace Stream:
+  export:
+    of
+    is_stream
+    is_empty
+    empty
+    first
+    rest
+    take
+    to_list
+
+  annot.macro 'of($(ann :: annot_meta.Parsed))':
+    def (ann_pred, ann_infos) = annot_meta.unpack_predicate(ann)
+    annot_meta.pack_predicate('Stream.is_stream', stream_meta.make_statinfo(ann_infos))
+
+  def is_stream = stream.#{stream?}
+  def is_empty  = stream.#{stream-empty?}
+  // TODO add static info to `to_list`
+  def to_list   = stream.#{stream->list}
+
+  def empty = stream.#{empty-stream}
+  statinfo.macro 'empty': stream_meta.make_statinfo()
+
+  annot.macro 'empty':
+    annot_meta.pack_predicate('is_empty', stream_meta.make_statinfo())
+
+  expr.macro
+  | 'first($(e :: expr_meta.Parsed))':
+      let infos = statinfo_meta.lookup(e, stream_meta.infos_key) || '()'
+      statinfo_meta.wrap('stream.#{stream-first}($e)', infos)
+  | 'first': 'stream.#{stream-first}'
+
+  expr.macro
+  | 'rest($(e :: expr_meta.Parsed))':
+      let infos = statinfo_meta.lookup(e, stream_meta.infos_key) || '()'
+      statinfo_meta.wrap('stream.#{stream-rest}($e)', stream_meta.make_statinfo(infos))
+  | 'rest':
+      let infos = stream_meta.make_statinfo()
+      statinfo_meta.wrap('stream.#{stream-rest}',
+                         '(($(statinfo_meta.call_result_key),
+                            $(statinfo_meta.pack(infos))))')
+
+  expr.macro
+  | 'take($(e :: expr_meta.Parsed))':
+      let of_infos = statinfo_meta.lookup(e, stream_meta.infos_key) || '()'
+      let infos = stream_meta.make_statinfo(of_infos)
+      statinfo_meta.wrap('fun (n :: NonnegInt): take($e, n)',
+                         '(($(statinfo_meta.call_result_key),
+                            $(statinfo_meta.pack(infos))))')
+  | 'take($(e :: expr_meta.Parsed), $n)':
+      let infos = statinfo_meta.lookup(e, stream_meta.infos_key) || '()'
+      statinfo_meta.wrap('stream.#{stream-take}($e, $n)',
+                         stream_meta.make_statinfo(infos))
+  | 'take':
+      let result_info = stream_meta.make_statinfo()
+      statinfo_meta.wrap('stream.#{stream-take}',
+                         '(($(statinfo_meta.call_result_key),
+                            $(statinfo_meta.pack(result_info))))')
+
+annot.macro 'Stream':
+  annot_meta.pack_predicate('Stream.is_stream', stream_meta.make_statinfo())
+
 dot.macro 'stream_dot_provider $left $dot $right':
   match right
-  | 'is_empty': 'stream.#{stream-empty?}($left)'
-  | 'first':    'stream.#{stream-first}($left)'
-  | 'rest':     'stream.#{stream-rest}($left)'
-  | 'take':     'fun (i) -: Stream: stream.#{stream-take}($left, i)'
-  | 'to_list':  'fun () -: List: stream.#{stream->list}($left)'
-  | 'count':    'fun (p): stream.count(p, $left)'
+  | 'is_empty': 'Stream.is_empty($left)'
+  | 'first':    'Stream.first($left)'
+  | 'rest':     'Stream.rest($left)'
+  | 'take':     'Stream.take($left)'
+  | 'to_list':  'Stream.to_list($left)'
 
