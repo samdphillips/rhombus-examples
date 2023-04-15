@@ -15,6 +15,14 @@ meta:
       '(($(statinfo_meta.dot_provider_key), stream_dot_provider),
         ($(infos_key), $of_info))'
 
+expr.macro
+| 'Stream($e, ..., ~rest: $r)':
+    statinfo_meta.wrap('stream.#{stream*}($e, ..., $r)',
+                       stream_meta.make_statinfo())
+| 'Stream($e, ...)':
+    statinfo_meta.wrap('stream.#{stream*}($e, ..., Stream.empty)',
+                       stream_meta.make_statinfo())
+
 namespace Stream:
   export:
     of
