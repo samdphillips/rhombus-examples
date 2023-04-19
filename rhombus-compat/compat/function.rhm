@@ -1,0 +1,15 @@
+#lang rhombus
+
+export:
+  thunk
+  loop
+
+macro 'thunk: $body':
+  'fun (): $body'
+  
+macro 'loop: $body':
+  '(block:
+      fun lp():
+        $body
+        lp()
+      lp())'

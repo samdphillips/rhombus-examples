@@ -2,10 +2,7 @@
 
 import:
   rhombus/meta open
-  lib("racket/base.rkt") as r:
-    rename:
-      #{close-input-port}  as close_input_port
-      #{close-output-port} as close_output_port
+  lib("racket/base.rkt") as r
   lib("racket/port.rkt") as p
 
 export:
@@ -18,8 +15,8 @@ export:
 
 fun close_port(p):
  if r.#{input-port?}(p)
- | r.close_input_port(p)
- | r.close_output_port(p)
+ | r.#{close-input-port}(p)
+ | r.#{close-output-port}(p)
 
 fun is_port(p): r.#{input-port?}(p) || r.#{output-port?}(p)
 
@@ -39,7 +36,7 @@ annot.macro 'InputPort':
 
 dot.macro 'input_port_dot_provider $left $dot $right':
   match right
-  | 'match':         'fun(arg): r.regexp_match(arg, $left)'
+  | 'match':         'fun(arg): r.#{regexp-match}(arg, $left)'
   | 'readline':      'fun (): r.#{read-line}($left)'
   | 'readline_evt':  'fun (): p.#{read-line-evt}($left)'
   | 'close':         'fun (): r.#{close-input-port}($left)'
