@@ -5,35 +5,8 @@ import: lib("racket/base.rkt") as r
         rhombus/meta open
 
 export:
-  |>
-  when
-  unless
-  thunk
-  loop
   letcc
 
 expr.macro 'letcc $k: $body':
   'r.#{call/cc}(fun($k): $body)'
 
-expr.macro 'loop: $body ...; ...':
-  'begin:
-      fun lp():
-        $body ...; ...
-        lp()
-      lp()'
-
-expr.macro 'thunk: $body':
-  'fun (): $body'
-
-
-expr.macro 'when $test ... : $body':
-  'if $test ...
-   | $body
-   | r.void()'
-
-expr.macro 'unless $test ... : $body':
-  'if $test ...
-   | r.void()
-   | $body'
-
-operator (a |> b): b(a)

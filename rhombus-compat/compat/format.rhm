@@ -6,4 +6,5 @@ import:
       #{~a} as a
       #{~r} as r
 
-export: format
+export:
+  all_from(.format)
