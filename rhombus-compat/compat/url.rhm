@@ -5,9 +5,13 @@ import:
     rename:
       #{string->url}     as from_string
       #{url-path}        as path
-      #{url-query}       as query
       #{path/param-path} as param_path
 
 export:
+  query
   all_from(.url)
 
+fun query(u):
+  for Map:
+    each Pair(k,v): url.#{url-query}(u)
+    values(k, v && to_string(v))
