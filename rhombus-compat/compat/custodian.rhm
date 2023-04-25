@@ -8,16 +8,14 @@ import:
     rename:
       #{current-custodian}      as current
       #{custodian-shutdown-all} as shutdown
-      #{make-custodian}         as make
+      #{make-custodian}         as _make
       #{custodian-limit-memory} as limit_memory
-    only:
-      current
-      shutdown
-      make
-      limit_memory
 
 export:
-  all_from(.custodian)
+  custodian.current
+  custodian.shutdown
+  custodian.limit_memory
+  make
   Custodian
   custodian_dot_provider
 
@@ -31,3 +29,5 @@ dot.macro 'custodian_dot_provider $left $dot $right':
   | 'limit_memory': 'fun(arg): custodian.limit_memory($left, arg)'
   | 'shutdown': 'fun(): custodian.shutdown($left)'
 
+fun make(c :: Custodian = custodian.current()) :~ Custodian:
+  custodian._make(c)

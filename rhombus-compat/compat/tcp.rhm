@@ -2,6 +2,7 @@
 
 import:
   rhombus/meta open
+  "port.rhm" open
   lib("racket/tcp.rkt"):
     rename:
       #{tcp-connect} as connect
@@ -11,10 +12,10 @@ import:
 
 export:
   all_from(.tcp)
-  TcpListener
+  Listener
   tcp_listener_dot_provider
 
-annot.macro 'TcpListener':
+annot.macro 'Listener':
   annot_meta.pack_predicate('tcp.#{tcp-listener?}',
                             '(($(statinfo_meta.dot_provider_key),
                                tcp_listener_dot_provider))')
@@ -23,5 +24,5 @@ dot.macro 'tcp_listener_dot_provider $left $dot $right':
   match right
   // One argument functions
   | 'close':      'fun(): tcp.close($left)'
-  | 'accept':     'fun(): tcp.accept($left)'
+  | 'accept':     'fun() :~ (InputPort, OutputPort) : tcp.accept($left)'
   | 'accept_evt': 'fun (): tcp.#{tcp-accept-evt}($left)'
