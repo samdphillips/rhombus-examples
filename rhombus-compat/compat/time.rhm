@@ -1,0 +1,13 @@
+#lang rhombus
+
+import:
+  lib("racket/base.rkt") as r
+
+export:
+  sleep; now
+
+fun sleep(n :: Number):
+  r.sleep(n)
+
+fun now() :: Int:
+  r.#{current-seconds}()
