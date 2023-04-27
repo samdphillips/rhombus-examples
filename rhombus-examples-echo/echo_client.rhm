@@ -6,7 +6,7 @@ import:
       random
       sleep
       void
-  rhombus/compat/extra:
+  rhombus/compat/function:
     expose:
       thunk
   rhombus/compat/port
