@@ -4,10 +4,13 @@ import:
   lib("racket/base.rkt") as r
 
 export:
-  sleep; now
+  sleep; now; now_inexact
 
 fun sleep(n :: Number):
   r.sleep(n)
 
 fun now() :: Int:
   r.#{current-seconds}()
+
+fun now_inexact():
+  r.#{current-inexact-milliseconds}()
