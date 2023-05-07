@@ -93,7 +93,7 @@ class Heatbug(~posn: mutable posn :: Posn,
     env.adjust_heat(this.posn, this.emit_temp)
   
 
-class Environment(~bug_cells: bug_cells :: Array.of(Maybe(Heatbug)),
+class Environment(~bug_cells: bug_cells :: Array.of(maybe(Heatbug)),
                   ~temp_cells: temp_cells :: Array.of(Real)):
   implements: Printable
               

@@ -48,13 +48,13 @@ fun draw_heatbugs(dc :: draw.DC, bugs :: heatbugs.Environment):
     def pos = heatbugs.Posn(i, j)
 
     dc.brush := draw.Brush(~color: patch_color(bugs.temp_at(pos)))
-    dc.rectangle(i * cell_size, j * cell_size, cell_size, cell_size)
+    dc.rectangle([i * cell_size, j * cell_size, cell_size, cell_size])
 
     unless bugs.is_cell_empty(pos)
     | def cur_bug :: heatbugs.Heatbug = bugs.bug_at(pos)
       dc.brush := draw.Brush(~color: bug_color(cur_bug.current_happiness(bugs)))
-      dc.ellipse(i * cell_size + cell_size/4, j * cell_size + cell_size/4,
-                 cell_size / 2, cell_size / 2)
+      dc.ellipse([i * cell_size + cell_size/4, j * cell_size + cell_size/4,
+                  cell_size / 2, cell_size / 2])
 
 gui.render(gui.Window(~title: "Heatbugs",
                       gui.Canvas(obs,
