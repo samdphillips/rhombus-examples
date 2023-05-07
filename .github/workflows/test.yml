@@ -75,3 +75,18 @@ jobs:
         run: raco pkg install --batch --auto ./rhombus-examples-echo
       - name: check dependencies
         run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-echo
+
+  test_heatbugs:
+    needs: test_compat
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: Install Rhombus prototype
+        uses: ./.github/actions/install-rhombus
+      - name: install Racket compat library
+        run: raco pkg install --batch --auto ./rhombus-compat
+      - name: install heatbugs example
+        run: raco pkg install --batch --auto ./rhombus-examples-heatbugs
+      - name: check dependencies
+        run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs rhombus-examples-heatbugs
