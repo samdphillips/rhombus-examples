@@ -1,6 +1,6 @@
 #lang rhombus
 
-submodule test:
+module test:
   import:
     "stream.rhm": open
 
