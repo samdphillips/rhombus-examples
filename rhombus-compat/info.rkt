@@ -5,5 +5,5 @@
 (define deps
   '("base"
     "rhombus-prototype"))
-(define module-suffixes '(#".rhm"))
+(define module-suffixes '(#"rhm"))
 
