@@ -11,7 +11,7 @@ meta:
     export infos_key make_statinfo
     def infos_key = '#%stream_of_info'
 
-    fun make_statinfo(of_info = '()' :: Syntax):
+    fun make_statinfo(of_info :: Syntax = '()'):
       '(($(statinfo_meta.dot_provider_key), stream_dot_provider),
         ($(infos_key), $of_info))'
 
