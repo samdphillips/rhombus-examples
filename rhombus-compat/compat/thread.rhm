@@ -10,17 +10,80 @@ export:
   rename:
     r.#{current-thread} as current
 
+  Evt
+  Channel
+
+
 annot.macro 'Thread':
   annot_meta.pack_predicate('r.#{thread?}',
                             '(($(statinfo_meta.dot_provider_key),
                                thread_dot_provider))')
 
-dot.macro 'thread_dot_provider $left $dot $right':
-  match right
-  | 'kill': 'fun (): r.#{kill-thread}($left)'
-  | 'wait': 'fun (): r.#{thread-wait}($left)'
+dot.macro 'thread_dot_provider $lt $dot $rt':
+  match rt
+  | 'dead_evt': 'fun () :~ Evt: r.{thread-dead-evt}($lt)'
+  | 'kill': 'fun (): r.#{kill-thread}($lt)'
+  | 'wait': 'fun (): r.#{thread-wait}($lt)'
   | _: #false
 
 expr.macro 'thread: $body':
   'r.thread(fun (): $body) :~ Thread'
+
+
+meta:
+  def evt_statinfo = '(($(statinfo_meta.dot_provider_key), evt_dot_provider))'
+  def evt_result_statinfo:
+    '(($(statinfo_meta.call_result_key),
+       $(statinfo_meta.pack(evt_statinfo))))'
+
+namespace Evt:
+  export:
+    handle
+    wrap
+
+  def handle = r.#{handle-evt}
+  statinfo.macro 'handle': evt_result_statinfo
+
+  def wrap = r.#{wrap-evt}
+  statinfo.macro 'wrap': evt_result_statinfo
+
+  def guard = r.#{guard-evt}
+  statinfo.macro 'guard': evt_result_statinfo
+
+annot.macro 'Evt':
+  annot_meta.pack_predicate('r.#{evt?}', evt_statinfo)
+
+dot.macro 'evt_dot_provider $lt . $rt':
+  match rt
+  | 'handle': 'fun(f) :~ Evt: Evt.handle($lt, f)'
+  | 'wrap': 'fun(f) :~ Evt: Evt.wrap($lt, f)'
+  | _: #false
+
+
+namespace Channel:
+  export:
+    get
+    put
+    put_evt
+
+  def get = r.#{channel-get}
+  def put = r.#{channel-put}
+
+  def put_evt = r.#{channel-put-evt}
+  statinfo.macro 'put_evt': evt_result_statinfo
+
+annot.macro 'Channel':
+  annot_meta.pack_predicate('r.#{channel?}',
+                            '(($(statinfo_meta.dot_provider_key),
+                               channel_dot_provider))')
+
+dot.macro 'channel_dot_provider $lt . $rt':
+  match rt
+  | 'get': 'fun(): Channel.get($lt)'
+  | 'put': 'fun(v): Channel.put($lt, v)'
+  | 'put_evt': 'fun (v) :~ Evt: Channel.put_evt($lt, v)'
+  | _: #false
+
+fun Channel() :~ Channel:
+  r.#{make-channel}()
 
