@@ -1,0 +1,44 @@
+#lang rhombus/static/and_meta
+
+import:
+  lib("racket/base.rkt") as r
+
+export:
+  def_logger
+
+decl.macro
+| 'def_logger $(name :: Identifier)':
+    'def_logger $name ~topic: #'$name'
+| 'def_logger $(name :: Identifier) ~topic: $topic_expr':
+    'def $name :~ Logger = r.#{make-logger}($topic_expr, r.#{current-logger}())'
+
+annot.macro 'Logger':
+  annot_meta.pack_predicate('r.#{logger?}',
+                            '(($statinfo_meta.dot_provider_key,
+                               logger_dot_provider))')
+
+meta:
+  syntax_class LogLevel
+  | 'fatal'
+  | 'error'
+  | 'warning'
+  | 'info'
+  | 'debug'
+
+dot.macro
+| 'logger_dot_provider $lt . when':
+    ~tail '($(level :: LogLevel)):
+             $body
+             ...'
+    values('when r.#{log-level?}($lt, #'$level)
+            | $body
+              ...',
+           '')
+| 'logger_dot_provider $lt . log_message':
+    ~tail '($level, $msg, $vals, ...)'
+    values('r.#{log-message}($lt, $level, r.format($msg, $vals, ...))', '')
+| 'logger_dot_provider $lt . $(rt :: LogLevel)':
+    ~tail '($msg, $vals, ...)'
+    values('($lt :~ Logger).when($rt):
+              ($lt :~ Logger).log_message(#'$rt, $msg, $vals, ...)',
+           '')
