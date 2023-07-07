@@ -1,7 +1,6 @@
-#lang rhombus
+#lang rhombus/static/and_meta
 
 import:
-  rhombus/meta open
   lib("racket/base.rkt") as r
 
 export:
@@ -13,14 +12,15 @@ export:
 
 annot.macro 'Thread':
   annot_meta.pack_predicate('r.#{thread?}',
-                            '(($(statinfo_meta.dot_provider_key), thread_dot_provider))')
+                            '(($(statinfo_meta.dot_provider_key),
+                               thread_dot_provider))')
 
 dot.macro 'thread_dot_provider $left $dot $right':
   match right
-  // One argument functions
   | 'kill': 'fun (): r.#{kill-thread}($left)'
   | 'wait': 'fun (): r.#{thread-wait}($left)'
+  | _: #false
 
 expr.macro 'thread: $body':
-  'r.thread(fun (): $body)'
+  'r.thread(fun (): $body) :~ Thread'
 
