@@ -104,13 +104,13 @@ class Environment(~bug_cells: bug_cells :: Array.of(maybe(Heatbug)),
     super(~bug_cells: bug_cells,
           ~temp_cells: Array.make(world_width * world_height, initial_temp))
 
-  override print(outp):
-    import rhombus
-    rhombus.display("Environment(num_bugs: ", outp)
-    rhombus.print(this.count_bugs(), outp)
-    rhombus.display(", average_temp: ", outp)
-    rhombus.print(this.average_temp(), outp)
-    rhombus.display(")", outp)
+  override describe(mode, recur):
+    PrintDesc.list("Environment(",
+                   [PrintDesc.block("num_bugs",
+                                    "" +& this.count_bugs()),
+                    PrintDesc.block("average_temp",
+                                    "" +& this.average_temp())],
+                   ")")
 
   fun place_bugs(bug_cells :: Array, num_bugs :: NonnegInt):    
     unless num_bugs == 0
