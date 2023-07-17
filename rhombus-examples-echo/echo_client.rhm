@@ -14,10 +14,10 @@ import:
 
 fun run(count, inp :~ port.InputPort, outp :~ port.OutputPort):
   unless (count == 0)
-  | outp.displayln("ping " +& count)
+  | outp.println("ping " +& count)
     outp.flush()
-    displayln("sent: " +& count)
-    displayln("received: " +& inp.readline())
+    println("sent: " +& count)
+    println("received: " +& inp.readline())
     sleep(random(5))
     run(count - 1, inp, outp)
 
