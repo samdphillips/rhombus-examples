@@ -36,20 +36,20 @@ fun handle_client_connection(n, inp :~ port.InputPort, outp :~ port.OutputPort):
   fun echo():
     select_evt
     | close_evt (_ignore):
-        displayln(n +& " closing on closed port")
+        println(n +& " closing on closed port")
         inp.close()
         outp.close()
     | inp.readline_evt() (line):
-        displayln(n +& " received: " +& line)
+        println(n +& " received: " +& line)
         if (base.is_eof(line))
-        | displayln(n +& " closing on eof")
+        | println(n +& " closing on eof")
           inp.close()
           outp.close()
-        | outp.displayln(line)
+        | outp.println(line)
           outp.flush()
           echo()
   echo()
-  displayln(n +& " exiting client thread")
+  println(n +& " exiting client thread")
 
 fun run(n = 0):
   select_evt
