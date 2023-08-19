@@ -19,6 +19,13 @@ dot.macro
 | 'Custodian $lhs $dot shutdown':
     ~tail '()'
     values('Custodian.shutdown($lhs)', '')
+| 'Custodian $lhs $dot $rhs':
+    match rhs
+    | 'limit_memory' || 'shutdown':
+        throw Exn.Fail.Syntax("method must be called",
+                              Continuation.current_marks(),
+                              [rhs])
+    | _: #false
 
 namespace Custodian:
   export:
