@@ -1,33 +1,38 @@
-#lang rhombus
+#lang rhombus/static/and_meta
 
 import:
-  rhombus/meta open
-
-  lib("racket/base.rkt") as r
-  lib("racket/base.rkt") as custodian:
-    rename:
-      #{current-custodian}      as current
-      #{custodian-shutdown-all} as shutdown
-      #{make-custodian}         as _make
-      #{custodian-limit-memory} as limit_memory
+  lib("racket/base.rkt")
 
 export:
-  custodian.current
-  custodian.shutdown
-  custodian.limit_memory
-  make
   Custodian
-  custodian_dot_provider
+
+meta:
+  def custodian_statinfo = '(($(statinfo_meta.dot_provider_key), Custodian))'
 
 annot.macro 'Custodian':
-  annot_meta.pack_predicate('r.#{custodian?}',
-                            '(($(statinfo_meta.dot_provider_key),
-                               custodian_dot_provider))')
+  annot_meta.pack_predicate('base.#{custodian?}', custodian_statinfo)
 
-dot.macro 'custodian_dot_provider $left $dot $right':
-  match right
-  | 'limit_memory': 'fun(arg): custodian.limit_memory($left, arg)'
-  | 'shutdown': 'fun(): custodian.shutdown($left)'
+dot.macro
+| 'Custodian $lhs $dot limit_memory':
+    ~tail '($args, ...)'
+    values('Custodian.limit_memory($lhs, $args, ...)', '')
+| 'Custodian $lhs $dot shutdown':
+    ~tail '()'
+    values('Custodian.shutdown($lhs)', '')
 
-fun make(c :: Custodian = custodian.current()) :~ Custodian:
-  custodian._make(c)
+namespace Custodian:
+  export:
+    current
+    shutdown
+    limit_memory
+
+  def current = base.#{current-custodian}
+  statinfo.macro 'current':
+    '(($(statinfo_meta.call_result_key),
+       $(statinfo_meta.pack(custodian_statinfo))))'
+
+  def shutdown = base.#{custodian-shutdown-all}
+  def limit_memory = base.#{custodian-limit-memory}
+
+fun Custodian(parent :: Custodian = Custodian.current()) :~ Custodian:
+  base.#{make-custodian}(parent)
