@@ -50,7 +50,9 @@ annot.macro 'OutputPort':
 dot.macro 'output_port_dot_provider $left $dot $right':
   match right
   | 'print':         'fun(arg): print(arg, $left)'
+  | 'display':       'fun(arg): r.display(arg, $left)'
   | 'println':       'fun(arg): println(arg, $left)'
+  | 'displayln':     'fun(arg): r.displayln(arg, $left)'
   | 'flush':         'fun(): r.#{flush-output}($left)'
   | 'close':         'fun (): r.#{close-output-port}($left)'
   | 'close_evt':     'fun (): r.#{port-closed-evt}($left)'
