@@ -6,6 +6,10 @@ import:
 export:
   Stream
 
+statinfo.key #%stream_of_info:
+  ~union: statinfo_meta.union
+  ~intersect: statinfo_meta.intersect
+
 meta:
   namespace stream_meta:
     export infos_key make_statinfo
@@ -92,4 +96,3 @@ dot.macro 'stream_dot_provider $left $dot $right':
   | 'rest':     'Stream.rest($left)'
   | 'take':     'Stream.take($left)'
   | 'to_list':  'Stream.to_list($left)'
-
